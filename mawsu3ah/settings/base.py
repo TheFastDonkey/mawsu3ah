@@ -130,6 +130,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
+        "mawsu3ah.contact": {
+            "handlers": _log_handlers,
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }
 

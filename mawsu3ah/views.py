@@ -2,6 +2,7 @@
 
 import json
 import logging
+import smtplib
 
 from django.conf import settings
 from django.contrib import messages
@@ -16,6 +17,7 @@ from django_ratelimit.decorators import ratelimit
 from .forms import ContactForm
 
 csp_logger = logging.getLogger("mawsu3ah.csp")
+contact_logger = logging.getLogger("mawsu3ah.contact")
 
 RATELIMITED_TEXT = (
     "تم تجاوز الحد المسموح. يرجى الانتظار قليلاً والمحاولة مرة أخرى."
@@ -110,15 +112,26 @@ def contact(request):
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
             body = f"من: {name} <{email}>\n\n{message}"
-            EmailMessage(
+            email_message = EmailMessage(
                 subject=f"[تواصل] {subject}",
                 body=body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[settings.CONTACT_EMAIL],
                 reply_to=[email],
-            ).send()
-            messages.success(request, "تم إرسال رسالتك، شكراً لتواصلك معنا.")
-            return redirect("contact")
+            )
+            try:
+                sent_count = email_message.send()
+            except (smtplib.SMTPException, OSError, TimeoutError) as exc:
+                contact_logger.error("Contact form email failed: %s", exc, exc_info=True)
+                sent_count = 0
+            if sent_count:
+                messages.success(request, "تم إرسال رسالتك، شكراً لتواصلك معنا.")
+                contact_logger.info("Contact form email sent to %s", settings.CONTACT_EMAIL)
+                return redirect("contact")
+            messages.error(
+                request,
+                "تعذر إرسال الرسالة حالياً. يرجى التحقق من إعدادات البريد أو المحاولة لاحقاً.",
+            )
     else:
         initial = {}
         if request.user.is_authenticated:
