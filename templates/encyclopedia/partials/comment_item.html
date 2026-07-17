@@ -1,0 +1,243 @@
+{% load encyclopedia_extras %}
+{% if review.parent is None %}
+<article id="review-{{ review.public_id }}" class="review{% if review.hidden %} review--hidden{% endif %}{% if review.user.is_expert %} review--expert{% endif %}">
+    <span class="review__label">مراجعة</span>
+
+    {% if review.hidden %}
+    <p class="review__body review__body--hidden">تم إخفاء هذه المراجعة.</p>
+    {% else %}
+    <p class="review__body">{{ review.body|linebreaksbr }}</p>
+    {% endif %}
+
+    <div class="review__footer">
+        <div class="review__author-block">
+            <div class="review__avatar" aria-hidden="true">{{ review.user.username|first }}</div>
+            <div class="review__meta">
+                <span class="review__author">{% user_name review.user %}</span>
+                <span class="review__date">{{ review.created_at|date:"Y/m/d · H:i" }}</span>
+                {% if review.edited_at %}<span class="review__edited">تم التعديل في {{ review.edited_at|date:"Y/m/d · H:i" }}</span>{% endif %}
+            </div>
+        </div>
+
+        <div class="review__actions">
+            {% include "encyclopedia/partials/review_vote_buttons.html" with review=review %}
+
+            <details class="review__reply-form">
+                <summary>
+                    <span class="show-text">تعليق</span>
+                    <span class="hide-text">إلغاء</span>
+                </summary>
+                {% if request.user.is_authenticated %}
+                <form
+                    hx-post="{% url 'review_reply_create' edition.book.slug edition.public_id review.public_id %}"
+                    hx-target="#review-{{ review.public_id }}"
+                    hx-swap="outerHTML"
+                >
+                    {% csrf_token %}
+                    <textarea name="body" rows="2" placeholder="اكتب تعليقك…" required></textarea>
+                    <button type="submit" class="c-button c-button--secondary c-button--sm">أرسل التعليق</button>
+                </form>
+                {% else %}
+                <div class="review__login-prompt">
+                    {% url 'edition_detail' edition.book.slug edition.public_id as edition_url %}
+                    {% include "encyclopedia/partials/sign_in_prompt.html" with next=edition_url %}
+                </div>
+                {% endif %}
+            </details>
+
+            {% if request.user.is_authenticated and review.reported_by_user %}
+            <span class="c-button c-button--sm c-button--ghost" disabled>تم الإبلاغ</span>
+            {% else %}
+            <details class="review__report-form">
+                <summary>
+                    <span class="show-text">إبلاغ</span>
+                    <span class="hide-text">إلغاء</span>
+                </summary>
+                {% if request.user.is_authenticated %}
+                    {% include "encyclopedia/partials/report_form.html" with review=review %}
+                {% else %}
+                <div class="review__login-prompt">
+                    {% url 'edition_detail' edition.book.slug edition.public_id as edition_url %}
+                    {% include "encyclopedia/partials/sign_in_prompt.html" with next=edition_url %}
+                </div>
+                {% endif %}
+            </details>
+            {% endif %}
+
+            {% if request.user == review.user %}
+            <details class="review__edit-form">
+                <summary>
+                    <span class="show-text">تعديل</span>
+                    <span class="hide-text">إلغاء</span>
+                </summary>
+                <form
+                    hx-post="{% url 'review_edit' review.public_id %}"
+                    hx-target="#review-{{ review.public_id }}"
+                    hx-swap="outerHTML"
+                >
+                    {% csrf_token %}
+                    <textarea name="body" rows="3" placeholder="اكتب مراجعتك…" required>{{ review.body }}</textarea>
+                    <button type="submit" class="c-button c-button--secondary c-button--sm">حفظ</button>
+                </form>
+            </details>
+            {% endif %}
+
+            {% if request.user.is_staff %}
+            <button
+                type="button"
+                class="c-button c-button--sm c-button--ghost"
+                hx-post="{% url 'review_hide_toggle' review.public_id %}"
+                hx-target="#review-{{ review.public_id }}"
+                hx-swap="outerHTML"
+            >
+                {% if review.hidden %}إظهار{% else %}إخفاء{% endif %}
+            </button>
+            {% endif %}
+
+            {% if request.user == review.user or request.user.is_staff %}
+            <button
+                type="button"
+                class="c-button c-button--sm c-button--danger"
+                hx-post="{% url 'review_delete' review.public_id %}"
+                hx-target="#reviews-list"
+                hx-swap="outerHTML"
+                hx-confirm="هل أنت متأكد من حذف هذه المراجعة؟"
+            >
+                حذف المراجعة
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if review.children %}
+    <details class="review__comments" open>
+        <summary>
+            <span class="show-text">عرض التعليقات ({{ review.descendant_count }})</span>
+            <span class="hide-text">إخفاء التعليقات</span>
+        </summary>
+        <div class="review__comments-list">
+            {% for child in review.children %}
+            {% include "encyclopedia/partials/comment_item.html" with review=child %}
+            {% endfor %}
+        </div>
+    </details>
+    {% endif %}
+</article>
+{% else %}
+<article id="review-{{ review.public_id }}" class="comment comment--depth-{% if review.depth > 3 %}4plus{% else %}{{ review.depth }}{% endif %}{% if review.hidden %} comment--hidden{% endif %}">
+    <div class="comment__header">
+        <span class="comment__author">{% user_name review.user %}</span>
+        <span class="comment__date">{{ review.created_at|date:"Y/m/d · H:i" }}</span>
+        {% if review.edited_at %}<span class="comment__edited">تم التعديل في {{ review.edited_at|date:"Y/m/d · H:i" }}</span>{% endif %}
+    </div>
+
+    {% if review.hidden %}
+    <p class="comment__body comment__body--hidden">تم إخفاء هذا التعليق.</p>
+    {% else %}
+    <p class="comment__body">{{ review.body|linebreaksbr }}</p>
+    {% endif %}
+
+    <div class="comment__actions">
+        {% include "encyclopedia/partials/review_vote_buttons.html" with review=review %}
+
+        <details class="comment__reply-form">
+            <summary>
+                <span class="show-text">رد</span>
+                <span class="hide-text">إلغاء</span>
+            </summary>
+            {% if request.user.is_authenticated %}
+            <form
+                hx-post="{% url 'review_reply_create' edition.book.slug edition.public_id review.public_id %}"
+                hx-target="#review-{{ review.public_id }}"
+                hx-swap="outerHTML"
+            >
+                {% csrf_token %}
+                <textarea name="body" rows="2" placeholder="اكتب ردك…" required></textarea>
+                <button type="submit" class="c-button c-button--secondary c-button--sm">أرسل الرد</button>
+            </form>
+            {% else %}
+            <div class="comment__login-prompt">
+                {% url 'edition_detail' edition.book.slug edition.public_id as edition_url %}
+                {% include "encyclopedia/partials/sign_in_prompt.html" with next=edition_url %}
+            </div>
+            {% endif %}
+        </details>
+
+        {% if request.user.is_authenticated and review.reported_by_user %}
+        <span class="c-button c-button--sm c-button--ghost" disabled>تم الإبلاغ</span>
+        {% else %}
+        <details class="comment__report-form">
+            <summary>
+                <span class="show-text">إبلاغ</span>
+                <span class="hide-text">إلغاء</span>
+            </summary>
+            {% if request.user.is_authenticated %}
+                {% include "encyclopedia/partials/report_form.html" with review=review %}
+            {% else %}
+            <div class="comment__login-prompt">
+                {% url 'edition_detail' edition.book.slug edition.public_id as edition_url %}
+                {% include "encyclopedia/partials/sign_in_prompt.html" with next=edition_url %}
+            </div>
+            {% endif %}
+            </details>
+            {% endif %}
+
+            {% if request.user == review.user %}
+            <details class="comment__edit-form">
+                <summary>
+                    <span class="show-text">تعديل</span>
+                    <span class="hide-text">إلغاء</span>
+                </summary>
+                <form
+                    hx-post="{% url 'review_edit' review.public_id %}"
+                    hx-target="#review-{{ review.public_id }}"
+                    hx-swap="outerHTML"
+                >
+                    {% csrf_token %}
+                    <textarea name="body" rows="2" placeholder="اكتب ردك…" required>{{ review.body }}</textarea>
+                    <button type="submit" class="c-button c-button--secondary c-button--sm">حفظ</button>
+                </form>
+            </details>
+            {% endif %}
+
+            {% if request.user.is_staff %}
+            <button
+                type="button"
+                class="c-button c-button--sm c-button--ghost"
+                hx-post="{% url 'review_hide_toggle' review.public_id %}"
+                hx-target="#review-{{ review.public_id }}"
+                hx-swap="outerHTML"
+            >
+                {% if review.hidden %}إظهار{% else %}إخفاء{% endif %}
+            </button>
+            {% endif %}
+
+            {% if request.user == review.user or request.user.is_staff %}
+            <button
+                type="button"
+                class="c-button c-button--sm c-button--danger"
+                hx-post="{% url 'review_delete' review.public_id %}"
+                hx-target="#review-{{ review.public_id }}"
+                hx-swap="delete"
+                hx-confirm="هل أنت متأكد من حذف هذا التعليق؟"
+            >
+                حذف التعليق
+            </button>
+            {% endif %}
+    </div>
+
+    {% if review.children %}
+    <details class="comment__replies" open>
+        <summary>
+            <span class="show-text">عرض الردود ({{ review.descendant_count }})</span>
+            <span class="hide-text">إخفاء الردود</span>
+        </summary>
+        <div class="comment__replies-list">
+            {% for child in review.children %}
+            {% include "encyclopedia/partials/comment_item.html" with review=child %}
+            {% endfor %}
+        </div>
+    </details>
+    {% endif %}
+</article>
+{% endif %}

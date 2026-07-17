@@ -1,0 +1,25 @@
+{% if categories %}
+<ul class="category-chip-suggestions">
+    {% for category in categories %}
+    <li>
+        <button
+            type="button"
+            class="category-chip-suggestion"
+            data-category-id="{{ category.pk }}"
+            data-category-name="{{ category.name }}"
+            data-category-path="{{ category.url_path }}"
+        >
+            <span class="category-chip-suggestion__name">{{ category.name }}</span>
+            {% if category.url_path %}
+            <span class="category-chip-suggestion__path">{{ category.url_path }}</span>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+{% elif query %}
+<p class="category-chip-suggestions-empty">
+    لا يوجد تصنيف بهذا الاسم.
+    <a href="{% url 'category_list' %}#suggest-category">اطلب تصنيفاً جديداً</a>.
+</p>
+{% endif %}

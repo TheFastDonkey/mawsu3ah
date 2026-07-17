@@ -1,0 +1,21 @@
+{% if books %}
+<ul class="search-suggestions">
+    {% for book in books %}
+    <li>
+        <a
+            href="#"
+            class="autocomplete-item"
+            data-field="id_existing_book"
+            data-value="{{ book.pk }}"
+            data-text-field="id_existing_book_search"
+            data-display="{{ book.title }}"
+        >
+            <span class="suggestion-title">{{ book.title }}</span>
+            <span class="suggestion-author">{{ book.authors.all|join:"، " }}</span>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% elif query %}
+<p class="search-suggestions-empty">لا توجد نتائج</p>
+{% endif %}

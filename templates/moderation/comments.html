@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}إدارة المراجعات — الموسوعة الكبرى{% endblock %}
+
+{% block content %}
+<header class="section-header">
+    <h1>إدارة المراجعات</h1>
+    <nav class="sub-nav">
+        <a href="{% url 'moderation:moderation_queue' %}" class="c-button c-button--ghost c-button--sm">طبعات قيد المراجعة</a>
+        <a href="{% url 'moderation:moderation_comments' %}" class="c-button c-button--secondary c-button--sm">المراجعات</a>
+        <a href="{% url 'moderation:report_queue' %}" class="c-button c-button--ghost c-button--sm">البلاغات</a>
+    </nav>
+</header>
+
+{% if page_obj.object_list %}
+    <p class="c-card__meta">{{ count }} مراجعة</p>
+    <div class="moderation-list">
+        {% for review in page_obj.object_list %}
+        <article class="c-card {% if review.hidden %}c-alert--error{% endif %}">
+            <div class="c-card__body">
+                <p class="c-card__meta">
+                    {% user_name review.user %}
+                    · {{ review.created_at|date:"Y/m/d H:i" }}
+                    · على <a href="{% url 'edition_detail' review.edition.book.slug review.edition.public_id %}">{{ review.edition.book.title }}</a>
+                    {% if review.parent %}
+                    · رد على <a href="{% url 'edition_detail' review.edition.book.slug review.edition.public_id %}#review-{{ review.parent.public_id }}">مراجعة {{ review.parent.public_id }}</a>
+                    {% endif %}
+                    {% if review.hidden %}
+                    <span class="c-badge c-badge--danger">مخفي</span>
+                    {% endif %}
+                </p>
+                <p class="review-body">{{ review.body }}</p>
+                <p class="c-card__meta">{{ review.vote_score }} تقييم</p>
+            </div>
+            <div class="c-card__footer">
+                <form action="{% url 'moderation:review_hide_toggle' review.public_id %}" method="post" class="inline-form">
+                    {% csrf_token %}
+                    {% if review.hidden %}
+                    <button type="submit" class="c-button c-button--secondary c-button--sm">إظهار المراجعة</button>
+                    {% else %}
+                    <button type="submit" class="c-button c-button--danger c-button--sm">إخفاء المراجعة</button>
+                    {% endif %}
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% include "encyclopedia/partials/pagination.html" with page_obj=page_obj %}
+{% else %}
+    <div class="c-empty-state">
+        <h2 class="c-empty-state__title">لا توجد مراجعات</h2>
+    </div>
+{% endif %}
+{% endblock %}

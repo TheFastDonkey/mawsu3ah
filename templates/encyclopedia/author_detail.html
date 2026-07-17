@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}{{ record.name }} — مؤلف{% endblock %}
+{% block meta_description %}كتب {{ record.name }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+
+{% block content %}
+<h1>{{ record.name }}</h1>
+<p class="page-subtitle">مؤلف · {{ books|length }} كتاب</p>
+
+{% if books %}
+    <ul class="book-list book-list--covers">
+        {% for book in books %}
+        <li class="book-list__item">
+            {% if book.first_cover_image %}
+            <a href="{% url 'book_detail' book.slug %}" class="book-list__cover-link" aria-hidden="true" tabindex="-1">
+                <img src="{{ MEDIA_URL }}{{ book.first_cover_image }}" alt="" class="book-list__cover" loading="lazy">
+            </a>
+            {% endif %}
+            <div class="book-list__content">
+                <a href="{% url 'book_detail' book.slug %}">{{ book.title }}</a>
+                <span class="book-list__count">{{ book.approved_edition_count }} طبعة معتمدة</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>لا توجد كتب معتمدة لهذا المؤلف.</p>
+{% endif %}
+{% endblock %}

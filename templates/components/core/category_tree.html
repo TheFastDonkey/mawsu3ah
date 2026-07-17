@@ -1,0 +1,32 @@
+{% comment %}
+  Category tree for sidebar and mobile menu.
+  Expects `sidebar_roots` from context processors.
+{% endcomment %}
+{% if sidebar_roots %}
+<div class="category-tree">
+    <h2 class="category-tree__title">التصنيفات</h2>
+    <ul class="category-tree__list">
+        {% for category in sidebar_roots %}
+        <li class="category-tree__item">
+            <a href="{{ category.get_absolute_url }}" class="category-tree__link">
+                <span>{{ category.name }}</span>
+                <span class="category-tree__count">{{ category.subtree_book_count }} كتاب</span>
+            </a>
+            {% if category.sidebar_children %}
+            <ul class="category-tree__children">
+                {% for child in category.sidebar_children %}
+                <li>
+                    <a href="{{ child.get_absolute_url }}" class="category-tree__link category-tree__link--child">
+                        <span>{{ child.name }}</span>
+                        <span class="category-tree__count">{{ child.subtree_book_count }} كتاب</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'category_list' %}" class="category-tree__all">كل التصنيفات</a>
+</div>
+{% endif %}

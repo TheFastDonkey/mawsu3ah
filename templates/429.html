@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}كثرة الطلبات — الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+
+{% block content %}
+<h1>كثرة الطلبات</h1>
+<p>{{ message }}</p>
+<p><a href="{% url 'home' %}">العودة إلى الرئيسية</a></p>
+{% endblock %}

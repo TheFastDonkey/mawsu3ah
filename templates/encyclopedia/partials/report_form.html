@@ -1,0 +1,20 @@
+{% load encyclopedia_extras %}
+<form
+    hx-post="{% url 'review_report_create' review.public_id %}"
+    hx-target="this"
+    hx-swap="outerHTML"
+>
+    {% csrf_token %}
+    <div class="report-form__fields">
+        <select name="reason" required aria-label="سبب البلاغ">
+            <option value="" disabled selected>اختر سبب البلاغ…</option>
+            <option value="inappropriate">محتوى غير لائق</option>
+            <option value="harassment">إساءة</option>
+            <option value="offtopic">غير ذي صلة</option>
+            <option value="spam">رسائل مزعجة / إعلانات</option>
+            <option value="other">أخرى</option>
+        </select>
+        <textarea name="details" rows="2" placeholder="تفاصيل إضافية (اختياري)…"></textarea>
+    </div>
+    <button type="submit" class="c-button c-button--secondary c-button--sm">إرسال البلاغ</button>
+</form>

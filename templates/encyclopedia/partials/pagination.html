@@ -1,0 +1,11 @@
+{% if page_obj.has_other_pages %}
+<nav class="pagination" aria-label="تصفح الصفحات">
+    {% if page_obj.has_previous %}
+    <a href="?q={{ query|default:''|urlencode }}&category={{ category_slug|default:''|urlencode }}&page={{ page_obj.previous_page_number }}">السابق</a>
+    {% endif %}
+    <span class="current">صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?q={{ query|default:''|urlencode }}&category={{ category_slug|default:''|urlencode }}&page={{ page_obj.next_page_number }}">التالي</a>
+    {% endif %}
+</nav>
+{% endif %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}{{ record.name }} — ناشر{% endblock %}
+{% block meta_description %}طبعات نشرها {{ record.name }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+
+{% block content %}
+<h1>{{ record.name }}</h1>
+<p class="page-subtitle">ناشر · {{ editions|length }} طبعة</p>
+
+{% if editions %}
+    <div class="edition-list">
+        {% for edition in editions %}
+            {% include "encyclopedia/partials/edition_list_item.html" %}
+        {% endfor %}
+    </div>
+{% else %}
+    <p>لا توجد طبعات معتمدة لهذا الناشر.</p>
+{% endif %}
+{% endblock %}

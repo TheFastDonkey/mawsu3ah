@@ -1,0 +1,31 @@
+{% if request.user.is_authenticated %}
+<span class="vote-group vote-group--small">
+    <button
+        type="button"
+        class="vote-button vote-button--like vote-button--small{% if suggestion.user_vote == 1 %} is-active{% endif %}"
+        hx-post="{% url 'category_suggestion_vote' suggestion.pk %}"
+        hx-vals='{"vote": "like"}'
+        hx-swap="none"
+        hx-disabled-elt=".vote-button"
+        aria-label="إعجاب"
+        aria-pressed="{% if suggestion.user_vote == 1 %}true{% else %}false{% endif %}"
+    >
+        {% include "components/core/icon.html" with name="thumbs-up" size=14 %}
+    </button>
+    <span class="vote-score vote-score--small" aria-label="التقييم">{{ suggestion.vote_score }}</span>
+    <button
+        type="button"
+        class="vote-button vote-button--dislike vote-button--small{% if suggestion.user_vote == -1 %} is-active{% endif %}"
+        hx-post="{% url 'category_suggestion_vote' suggestion.pk %}"
+        hx-vals='{"vote": "dislike"}'
+        hx-swap="none"
+        hx-disabled-elt=".vote-button"
+        aria-label="عدم إعجاب"
+        aria-pressed="{% if suggestion.user_vote == -1 %}true{% else %}false{% endif %}"
+    >
+        {% include "components/core/icon.html" with name="thumbs-down" size=14 %}
+    </button>
+</span>
+{% else %}
+<span class="vote-score vote-score--small">{{ suggestion.vote_score }}</span>
+{% endif %}

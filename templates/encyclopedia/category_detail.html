@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block meta_description %}كتب تصنيف {{ category.name }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+{% block og_title %}{{ category.name }}{% endblock %}
+{% block og_description %}استعرض كتب تصنيف {{ category.name }} وطبعاتها المعتمدة.{% endblock %}
+{% block canonical_url %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ category.get_absolute_url }}">{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <nav class="category-breadcrumb" aria-label="مسار التصنيف">
+        <ol>
+            <li><a href="{% url 'category_list' %}">التصنيفات</a></li>
+            {% for ancestor in ancestors %}
+            <li><a href="{{ ancestor.get_absolute_url }}">{{ ancestor.name }}</a></li>
+            {% endfor %}
+            <li aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+    <p class="kicker">تصنيف</p>
+    <h1>{{ category.name }}</h1>
+</section>
+
+{% if children %}
+<section class="category-children" aria-labelledby="category-children-heading">
+    <h2 id="category-children-heading" class="categories-section__title">تصنيفات فرعية</h2>
+    <div class="category-children__grid">
+        {% for child in children %}
+        <a class="category-children__tile" href="{{ child.get_absolute_url }}">
+            <span class="category-children__name">{{ child.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if books %}
+<div class="edition-grid">
+    {% for book in books %}
+    <article class="edition-card">
+        <h3><a href="{% url 'book_detail' book.slug %}">{{ book.title }}</a></h3>
+        <p class="edition-author">{% name_links book.authors.all "author" %}</p>
+        <p class="edition-publisher">{{ book.approved_edition_count }} طبعة معتمدة</p>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<p class="empty-state">لا توجد كتب معتمدة في هذا التصنيف.</p>
+{% endif %}
+{% endblock %}

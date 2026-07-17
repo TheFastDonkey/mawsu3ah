@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}الدخول برابط سريع — الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+
+{% block content %}
+<h1>الدخول برابط سريع</h1>
+<p>أدخل بريدك الإلكتروني وسنرسل لك رابطاً للدخول.</p>
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" name="email" required>
+    </p>
+    <button type="submit">إرسال الرابط</button>
+</form>
+<div class="auth-links">
+    <p><a href="{% url 'login' %}">العودة إلى تسجيل الدخول</a></p>
+</div>
+{% endblock %}

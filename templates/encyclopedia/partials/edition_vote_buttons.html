@@ -1,0 +1,31 @@
+<div id="edition-vote-buttons-{{ edition.public_id }}" class="vote-group{% if size == 'small' %} vote-group--small{% endif %}">
+    {% with context_pk=context_book.pk|default:edition.book.pk %}
+    <button
+        type="button"
+        class="vote-button vote-button--like{% if size == 'small' %} vote-button--small{% endif %}{% if user_vote == 1 %} is-active{% endif %}"
+        hx-post="{% url 'edition_vote' edition.book.slug edition.public_id %}"
+        hx-vals='{"vote": "like", "context_book": "{{ context_pk }}"}'
+        hx-target="#edition-vote-buttons-{{ edition.public_id }}"
+        hx-swap="outerHTML"
+        hx-disabled-elt=".vote-button"
+        aria-label="إعجاب"
+        aria-pressed="{% if user_vote == 1 %}true{% else %}false{% endif %}"
+    >
+        {% include "components/core/icon.html" with name="thumbs-up" size=icon_size|default:18 %}
+    </button>
+    <span class="vote-score{% if size == 'small' %} vote-score--small{% endif %}" aria-label="التقييم">{{ edition.vote_score }}</span>
+    <button
+        type="button"
+        class="vote-button vote-button--dislike{% if size == 'small' %} vote-button--small{% endif %}{% if user_vote == -1 %} is-active{% endif %}"
+        hx-post="{% url 'edition_vote' edition.book.slug edition.public_id %}"
+        hx-vals='{"vote": "dislike", "context_book": "{{ context_pk }}"}'
+        hx-target="#edition-vote-buttons-{{ edition.public_id }}"
+        hx-swap="outerHTML"
+        hx-disabled-elt=".vote-button"
+        aria-label="عدم إعجاب"
+        aria-pressed="{% if user_vote == -1 %}true{% else %}false{% endif %}"
+    >
+        {% include "components/core/icon.html" with name="thumbs-down" size=icon_size|default:18 %}
+    </button>
+    {% endwith %}
+</div>

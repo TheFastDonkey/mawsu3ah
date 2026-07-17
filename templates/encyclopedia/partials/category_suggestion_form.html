@@ -1,0 +1,35 @@
+<form
+    class="category-suggestion-form"
+    hx-post="{% url 'suggest_category' book.slug %}"
+    hx-target="this"
+    hx-swap="outerHTML"
+>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+        {% include "components/core/alert.html" with message=error type="error" %}
+    {% endfor %}
+    {% for error in form.category.errors %}
+        {% include "components/core/alert.html" with message=error type="error" %}
+    {% endfor %}
+    <div class="category-autocomplete">
+        <input
+            type="text"
+            name="q"
+            class="c-input category-autocomplete__input"
+            placeholder="ابدأ بكتابة اسم التصنيف..."
+            autocomplete="off"
+            hx-get="{% url 'category_autocomplete' %}"
+            hx-trigger="keyup changed delay:200ms"
+            hx-target="#category-autocomplete-results"
+            hx-swap="innerHTML"
+            hx-indicator=".category-autocomplete__indicator"
+        >
+        <span class="category-autocomplete__indicator">جارٍ البحث…</span>
+        <div id="category-autocomplete-results" class="category-autocomplete__results"></div>
+        <input type="hidden" name="category" id="category-suggestion-category-id">
+    </div>
+    <p class="category-suggestion__fallback">
+        لم تجد التصنيف؟ <a href="{% url 'category_list' %}#suggest-category">اقترح تصنيفاً جديداً</a>.
+    </p>
+    <button type="submit" class="c-button c-button--primary c-button--sm">إرسال الاقتراح</button>
+</form>

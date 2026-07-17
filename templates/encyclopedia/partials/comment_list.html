@@ -1,0 +1,35 @@
+<section id="reviews-list" class="reviews-list">
+    {% if inherited_reviews %}
+    <div class="reviews-list__inherited">
+        <h3 class="reviews-list__title">مراجعات الطبعة الأصل ({{ inherited_reviews|length }})</h3>
+        {% for review in inherited_reviews %}
+        {% include "encyclopedia/partials/comment_item.html" with review=review %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h3 class="reviews-list__title">مراجعات هذه الطبعة ({{ reviews|length }})</h3>
+
+    {% for review in reviews %}
+    {% include "encyclopedia/partials/comment_item.html" with review=review %}
+    {% empty %}
+    <p class="empty-state">لا توجد مراجعات بعد.</p>
+    {% endfor %}
+
+    {% if request.user.is_authenticated %}
+    <form
+        class="review-form"
+        hx-post="{% url 'review_create' edition.book.slug edition.public_id %}"
+        hx-target="#reviews-list"
+        hx-swap="outerHTML"
+    >
+        {% csrf_token %}
+        {{ review_form.as_p }}
+        <button type="submit" class="c-button c-button--primary c-button--md">أضف مراجعة</button>
+    </form>
+    {% else %}
+    <p class="review-form-placeholder">
+        {% include "encyclopedia/partials/sign_in_prompt.html" %} لتتمكن من إضافة مراجعة.
+    </p>
+    {% endif %}
+</section>

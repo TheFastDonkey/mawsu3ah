@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل الملف الشخصي — الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+
+{% load encyclopedia_extras %}
+
+{% block content %}
+<h1 class="page-title">تعديل الملف الشخصي</h1>
+
+<form method="post" enctype="multipart/form-data" class="profile-form">
+  {% csrf_token %}
+
+  <div class="form-section">
+    <h2 class="form-section__title">الصورة والنبذة</h2>
+
+    <div class="c-form-field profile-form__avatar-field">
+      <label for="{{ form.avatar.id_for_label }}" class="c-form-field__label">{{ form.avatar.label }}</label>
+      <div class="profile-form__avatar-preview">
+        {% avatar user size="lg" %}
+      </div>
+      {{ form.avatar }}
+      {% if form.avatar.help_text %}
+        <span class="c-form-field__help">{{ form.avatar.help_text }}</span>
+      {% endif %}
+      {% if form.avatar.errors %}
+        <ul class="c-form-field__errors">{% for error in form.avatar.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+
+    <div class="c-form-field">
+      <label for="{{ form.bio.id_for_label }}" class="c-form-field__label">{{ form.bio.label }}</label>
+      {{ form.bio }}
+      {% if form.bio.errors %}
+        <ul class="c-form-field__errors">{% for error in form.bio.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+
+    <div class="c-form-field">
+      <label for="{{ form.location.id_for_label }}" class="c-form-field__label">{{ form.location.label }}</label>
+      {{ form.location }}
+      {% if form.location.errors %}
+        <ul class="c-form-field__errors">{% for error in form.location.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h2 class="form-section__title">الروابط</h2>
+
+    <div class="c-form-field">
+      <label for="{{ form.website.id_for_label }}" class="c-form-field__label">{{ form.website.label }}</label>
+      {{ form.website }}
+      {% if form.website.errors %}
+        <ul class="c-form-field__errors">{% for error in form.website.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+
+    <div class="field-row field-row--social">
+      <div class="c-form-field">
+        <label for="{{ form.twitter_x.id_for_label }}" class="c-form-field__label">{{ form.twitter_x.label }}</label>
+        {{ form.twitter_x }}
+        {% if form.twitter_x.errors %}
+          <ul class="c-form-field__errors">{% for error in form.twitter_x.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      <div class="c-form-field">
+        <label for="{{ form.telegram.id_for_label }}" class="c-form-field__label">{{ form.telegram.label }}</label>
+        {{ form.telegram }}
+        {% if form.telegram.errors %}
+          <ul class="c-form-field__errors">{% for error in form.telegram.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="c-form-field">
+      <label for="{{ form.facebook.id_for_label }}" class="c-form-field__label">{{ form.facebook.label }}</label>
+      {{ form.facebook }}
+      {% if form.facebook.errors %}
+        <ul class="c-form-field__errors">{% for error in form.facebook.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="c-button c-button--primary c-button--md">حفظ التغييرات</button>
+    <a href="{% url 'public_profile' user.username %}" class="c-button c-button--secondary c-button--md">عرض الملف الشخصي</a>
+  </div>
+</form>
+{% endblock %}

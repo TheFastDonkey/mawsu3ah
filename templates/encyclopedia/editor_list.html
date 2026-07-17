@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}المحققون — الموسوعة الكبرى{% endblock %}
+{% block meta_description %}تصفح قائمة المحققين في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>المحققون</h1>
+    <p class="page-subtitle">المحققون الذين لديهم طبعات معتمدة في الموسوعة.</p>
+</section>
+
+<section class="content-section">
+    {% if page_obj.object_list %}
+    <ul class="book-list">
+        {% for editor in page_obj %}
+        <li class="book-list__item">
+            <a href="{% url 'editor_detail' editor.slug %}">{{ editor.name }}</a>
+            <span class="book-list__count">{{ editor.edition_count }} طبعة</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% include "components/core/pagination.html" with page_obj=page_obj %}
+    {% else %}
+    <p class="empty-state">لا يوجد محققون معتمدون بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

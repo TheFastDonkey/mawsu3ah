@@ -1,0 +1,17 @@
+{% if books %}
+<ul class="search-suggestions">
+    {% for book in books %}
+    <li>
+        <a href="{% url 'book_detail' book.slug %}">
+            <span class="suggestion-title">{{ book.title }}</span>
+            <span class="suggestion-author">{{ book.author }}</span>
+        </a>
+    </li>
+    {% endfor %}
+    <li class="suggestion-all">
+        <a href="{% url 'search' %}?q={{ query|urlencode }}">عرض كل النتائج</a>
+    </li>
+</ul>
+{% elif query %}
+<p class="search-suggestions-empty">لا توجد نتائج</p>
+{% endif %}

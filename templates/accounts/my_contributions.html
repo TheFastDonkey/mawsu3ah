@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}المساهمات{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">المساهمات</h1>
+    <p class="page-subtitle">تتبع طلباتك ومساهماتك في الموسوعة.</p>
+</div>
+
+{% if pending_count %}
+<div class="c-alert">
+    <p>لديك <strong>{{ pending_count }}</strong> مساهمة/طلب قيد المراجعة.</p>
+</div>
+{% endif %}
+
+{% if not editions and not category_suggestions and not category_requests and not name_records and not edit_suggestions %}
+<div class="empty-state">
+    <p>لم تقدّم أي مساهمات بعد.</p>
+    <a href="{% url 'submit_edition' %}" class="c-button c-button--primary">ترشيح طبعة</a>
+</div>
+{% else %}
+
+{% if editions %}
+<section class="contributions-section">
+    <h2 class="contributions-section__title">الطبعات المقترحة</h2>
+    <ul class="contributions-list">
+        {% for edition in editions %}
+        <li class="contribution-item">
+            <div class="contribution-item__main">
+                <a href="{{ edition.get_absolute_url }}" class="contribution-item__name">{{ edition.book.title }}</a>
+                <span class="contribution-item__meta">
+                    {% name_links edition.publishers.all "publisher" %}
+                    {% if edition.year %} · {{ edition.year }}{% endif %}
+                </span>
+            </div>
+            <div class="contribution-item__side">
+                {% include "accounts/_status_badge.html" with status=edition.status %}
+                <span class="contribution-item__date">{{ edition.submitted_at|date:"Y-m-d" }}</span>
+            </div>
+            {% if edition.status == 'rejected' and edition.rejection_reason %}
+            <p class="contribution-item__note"><strong>سبب الرفض:</strong> {{ edition.rejection_reason }}</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% if edit_suggestions %}
+<section class="contributions-section">
+    <h2 class="contributions-section__title">اقتراحات تعديل طبعات</h2>
+    <ul class="contributions-list">
+        {% for suggestion in edit_suggestions %}
+        <li class="contribution-item">
+            <div class="contribution-item__main">
+                <a href="{{ suggestion.edition.get_absolute_url }}" class="contribution-item__name">{{ suggestion.edition.book.title }}</a>
+                <span class="contribution-item__meta">
+                    {% if suggestion.proposed_publishers %}{% for name in suggestion.proposed_publishers %}{% name_link name "publisher" %}{% if not forloop.last %}، {% endif %}{% endfor %}{% endif %}
+                    {% if suggestion.proposed_editors %} · محققون: {% for name in suggestion.proposed_editors %}{% name_link name "editor" %}{% if not forloop.last %}، {% endif %}{% endfor %}{% endif %}
+                    {% if suggestion.year %} · {{ suggestion.year }}{% endif %}
+                </span>
+            </div>
+            <div class="contribution-item__side">
+                {% include "accounts/_status_badge.html" with status=suggestion.status %}
+                <span class="contribution-item__date">{{ suggestion.created_at|date:"Y-m-d" }}</span>
+            </div>
+            {% if suggestion.status == 'rejected' and suggestion.admin_note %}
+            <p class="contribution-item__note"><strong>ملاحظة المشرف:</strong> {{ suggestion.admin_note }}</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% if category_suggestions %}
+<section class="contributions-section">
+    <h2 class="contributions-section__title">اقتراحات تصنيفات للكتب</h2>
+    <ul class="contributions-list">
+        {% for suggestion in category_suggestions %}
+        <li class="contribution-item">
+            <div class="contribution-item__main">
+                {% if suggestion.final_category %}
+                <a href="{{ suggestion.final_category.get_absolute_url }}" class="contribution-item__name">{{ suggestion.name }}</a>
+                {% else %}
+                <span class="contribution-item__name">{{ suggestion.name }}</span>
+                {% endif %}
+                <span class="contribution-item__meta">للكتاب <a href="{{ suggestion.book.get_absolute_url }}">{{ suggestion.book.title }}</a></span>
+            </div>
+            <div class="contribution-item__side">
+                {% if suggestion.status == 'pending' %}
+                    {% include "accounts/_status_badge.html" with status=suggestion.status label="غير مُتحقَّق" variant="warning" %}
+                {% else %}
+                    {% include "accounts/_status_badge.html" with status=suggestion.status %}
+                {% endif %}
+                <span class="contribution-item__date">{{ suggestion.created_at|date:"Y-m-d" }}</span>
+            </div>
+            {% if suggestion.status == 'rejected' and suggestion.admin_note %}
+            <p class="contribution-item__note"><strong>ملاحظة المشرف:</strong> {{ suggestion.admin_note }}</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% if category_requests %}
+<section class="contributions-section">
+    <h2 class="contributions-section__title">طلبات تصنيفات جديدة</h2>
+    <ul class="contributions-list">
+        {% for req in category_requests %}
+        <li class="contribution-item">
+            <div class="contribution-item__main">
+                {% if req.final_category %}
+                <a href="{{ req.final_category.get_absolute_url }}" class="contribution-item__name">{{ req.name }}</a>
+                {% else %}
+                <span class="contribution-item__name">{{ req.name }}</span>
+                {% endif %}
+            </div>
+            <div class="contribution-item__side">
+                {% include "accounts/_status_badge.html" with status=req.status %}
+                <span class="contribution-item__date">{{ req.created_at|date:"Y-m-d" }}</span>
+            </div>
+            {% if req.status == 'rejected' and req.admin_note %}
+            <p class="contribution-item__note"><strong>ملاحظة المشرف:</strong> {{ req.admin_note }}</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% if name_records %}
+<section class="contributions-section">
+    <h2 class="contributions-section__title">أسماء مقترحة</h2>
+    <ul class="contributions-list">
+        {% for record in name_records %}
+        <li class="contribution-item">
+            <div class="contribution-item__main">
+                <span class="contribution-item__name">{% name_link record.name record.kind record.slug %}</span>
+                <span class="contribution-item__meta">{{ record.get_kind_display }}</span>
+            </div>
+            <div class="contribution-item__side">
+                {% include "accounts/_status_badge.html" with status=record.status %}
+                <span class="contribution-item__date">{{ record.submitted_at|date:"Y-m-d" }}</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% endif %}
+{% endblock %}

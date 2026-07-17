@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}التصنيفات — الموسوعة الكبرى{% endblock %}
+{% block meta_description %}تصفح تصنيفات الكتب في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>التصنيفات</h1>
+    <p class="page-subtitle">تصفح التصنيفات أو اقترح تصنيفاً جديداً.</p>
+</section>
+
+<section class="categories-section" id="suggest-category">
+    <h2 class="categories-section__title">اقتراح تصنيف جديد</h2>
+    {% if request.user.is_authenticated %}
+        <button
+            class="c-button c-button--secondary c-button--sm"
+            hx-get="{% url 'request_category' %}"
+            hx-target="#category-request-form"
+            hx-swap="innerHTML"
+        >اقترح تصنيفاً</button>
+        <div id="category-request-form"></div>
+    {% else %}
+        <a
+            class="c-button c-button--secondary c-button--sm"
+            href="{% url 'login' %}?next={{ request.path|urlencode }}#suggest-category"
+        >اقترح تصنيفاً</a>
+        <p class="category-request__login-hint">
+            <a href="{% url 'login' %}?next={{ request.path|urlencode }}#suggest-category">سجّل الدخول</a> لإرسال اقتراح.
+        </p>
+    {% endif %}
+</section>
+
+<section class="categories-section">
+    <h2 class="categories-section__title">قاعدة التصنيفات</h2>
+    {% if roots %}
+    <nav aria-label="شجرة التصنيفات">
+        <ul class="category-tree">
+            {% for category in roots %}
+            <li class="category-tree__node">
+                <a class="category-tree__link" href="{{ category.get_absolute_url }}">
+                    <span class="category-tree__name">{{ category.name }}</span>
+                    <span class="category-tree__count">{{ category.subtree_book_count }} كتاب</span>
+                </a>
+                {% if category.children.all %}
+                    {% include "encyclopedia/partials/category_tree_node.html" with categories=category.children.all %}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% else %}
+    <p class="empty-state">لا توجد تصنيفات بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% comment %}
+  Theme toggle button.
+
+  Requires Lucide and the theme script in base.html.
+{% endcomment %}
+<button id="theme-toggle" type="button" aria-label="تبديل الوضع">
+  {% include "components/core/icon.html" with name="moon" class="icon-moon" %}
+  {% include "components/core/icon.html" with name="sun" class="icon-sun" %}
+</button>

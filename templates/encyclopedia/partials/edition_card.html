@@ -1,0 +1,44 @@
+{% load encyclopedia_extras %}
+<article class="edition-card">
+    {% if edition.submitted_by.is_expert and edition.is_best %}
+    <div class="edition-card__top-left">
+        <span class="edition-card__expert-like" aria-label="رشحها خبير">
+            {% include "components/core/icon.html" with name="award" size=14 %}
+            رشحها خبير
+        </span>
+    </div>
+    {% endif %}
+    <div class="edition-card__cover">
+        {% if edition.cover_image %}
+        <img src="{{ edition.cover_image.url }}" alt="" loading="lazy">
+        {% else %}
+        <span class="edition-card__cover-fallback" aria-hidden="true">
+            {% include "components/core/icon.html" with name="book-open" size=48 %}
+        </span>
+        {% endif %}
+    </div>
+    <div class="edition-card__body">
+        <h3><a href="{% url 'edition_detail' edition.book.slug edition.public_id %}">{{ edition.book.title }}</a></h3>
+        <p class="edition-author">{% name_links edition.book.authors.all "author" %}</p>
+        {% if edition.editors.all %}
+        <p class="edition-editor">{% name_links edition.editors.all "editor" %}</p>
+        {% endif %}
+        <p class="edition-publisher">{% name_links edition.publishers.all "publisher" %}{% if edition.year %} · {{ edition.year }}{% endif %}</p>
+        <p class="edition-card__submitter">
+            مقدمة من {% user_name edition.submitted_by %}
+        </p>
+
+        {% include "encyclopedia/partials/review_bubbles.html" with edition=edition %}
+
+        <div class="edition-footer">
+            {% include "encyclopedia/partials/edition_vote_buttons.html" with edition=edition user_vote=edition.user_vote size="small" icon_size=16 %}
+            {% if edition.review_count %}
+            <a class="review-count-link" href="{% url 'edition_detail' edition.book.slug edition.public_id %}">
+                {{ edition.review_count }} مراجعة{% if edition.review_count != 1 %}ات{% endif %}
+            </a>
+            {% else %}
+            <span class="review-count-link review-count-link--muted">لا مراجعات</span>
+            {% endif %}
+        </div>
+    </div>
+</article>

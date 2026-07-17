@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}اقتراح طبعة مصورة أو إعادة طبع لـ {{ source.book.title }}{% endblock %}
+
+{% block content %}
+<h1>اقتراح طبعة مصورة أو إعادة طبع</h1>
+<p class="form-note">كل اقتراح يمر بالمراجعة قبل اعتماده.</p>
+
+<div class="edit-target-card">
+    <p><strong>{{ source.book.title }}</strong></p>
+    <p class="edit-target-meta">{{ source.publishers.all|join:"، " }}{% if source.year %} — {{ source.year }}{% endif %}</p>
+</div>
+
+<form method="post" action="{% url 'suggest_edition_relation' book_slug=source.book.slug edition_public_id=source.public_id %}">
+    {% csrf_token %}
+
+    {% for error in form.non_field_errors %}
+        {% include "components/core/alert.html" with message=error type="error" %}
+    {% endfor %}
+
+    <fieldset class="form-section">
+        <legend>نوع الطبعة</legend>
+        <div class="target-mode-toggle">
+            {{ form.target_mode }}
+        </div>
+        {% for error in form.target_mode.errors %}
+            {% include "components/core/alert.html" with message=error type="error" %}
+        {% endfor %}
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend>الطبعة المرتبطة</legend>
+
+        <div id="existing-target-fields" class="target-fields">
+            <div class="form-field">
+                <label for="id_target_search">الطبعة</label>
+                <input
+                    type="text"
+                    id="id_target_search"
+                    name="edition_search"
+                    class="c-input"
+                    placeholder="ابدأ بعنوان الكتاب أو الناشر أو سنة النشر..."
+                    autocomplete="off"
+                    hx-get="{% url 'edition_suggestions' %}?book={{ source.book.pk }}&exclude={{ source.public_id }}&field_id=id_target&text_field_id=id_target_search"
+                    hx-trigger="keyup changed delay:300ms"
+                    hx-target="#id_target-suggestions"
+                    hx-indicator="#id_target-indicator"
+                >
+                <span id="id_target-indicator" class="htmx-indicator">جارٍ البحث…</span>
+                <div id="id_target-suggestions" class="suggestions-dropdown"></div>
+                {% for error in form.target.errors %}
+                    {% include "components/core/alert.html" with message=error type="error" %}
+                {% endfor %}
+                <input type="hidden" name="target" id="id_target" value="{{ form.target.value|default:'' }}">
+            </div>
+        </div>
+
+        <div id="new-target-fields" class="target-fields" hidden>
+            <div class="autocomplete-field chip-autocomplete">
+                <label for="id_publisher_search" class="c-form-field__label">{{ form.publisher_search.label }}</label>
+                <div id="id_publisher_chips" class="name-chips"></div>
+                <div class="autocomplete-input-row">
+                    {{ form.publisher_search }}
+                    {% include "components/core/button.html" with label="+" type="button" variant="secondary" size="sm" class="chip-add-btn" attrs='data-field="id_publisher_search" aria-label="إضافة ناشر"' %}
+                </div>
+                <div id="id_publisher-suggestions" class="autocomplete-results"></div>
+                {{ form.new_publishers }}
+                {% if form.new_publishers.errors %}
+                    <ul class="c-form-field__errors">
+                        {% for error in form.new_publishers.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+                <div id="id_publisher-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
+                    {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
+                    <span>جارٍ البحث...</span>
+                </div>
+            </div>
+
+            <div class="autocomplete-field chip-autocomplete">
+                <label for="id_editor_search" class="c-form-field__label">{{ form.editor_search.label }}</label>
+                <div id="id_editor_chips" class="name-chips"></div>
+                <div class="autocomplete-input-row">
+                    {{ form.editor_search }}
+                    {% include "components/core/button.html" with label="+" type="button" variant="secondary" size="sm" class="chip-add-btn" attrs='data-field="id_editor_search" aria-label="إضافة محقق"' %}
+                </div>
+                <div id="id_editor-suggestions" class="autocomplete-results"></div>
+                {{ form.new_editors }}
+                {% if form.new_editors.errors %}
+                    <ul class="c-form-field__errors">
+                        {% for error in form.new_editors.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+                <div id="id_editor-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
+                    {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
+                    <span>جارٍ البحث...</span>
+                </div>
+            </div>
+
+            <div class="field-row">
+                {% include "components/core/form_field.html" with field=form.new_year %}
+                {% include "components/core/form_field.html" with field=form.new_volumes %}
+            </div>
+            <div class="field-row">
+                {% include "components/core/form_field.html" with field=form.new_page_count %}
+                {% include "components/core/form_field.html" with field=form.new_city %}
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend>العلاقة</legend>
+        {% include "components/core/form_field.html" with field=form.kind %}
+        {% include "components/core/form_field.html" with field=form.reason %}
+    </fieldset>
+
+    {% include "components/core/button.html" with label="إرسال الاقتراح" type="submit" variant="primary" %}
+    <a href="{{ source.get_absolute_url }}" class="c-button c-button--ghost">إلغاء</a>
+</form>
+
+<script nonce="{{ request.csp_nonce }}">
+(function () {
+    const radios = document.querySelectorAll('input[name="target_mode"]');
+    const existing = document.getElementById('existing-target-fields');
+    const novel = document.getElementById('new-target-fields');
+
+    function updateMode() {
+        const value = document.querySelector('input[name="target_mode"]:checked')?.value;
+        if (value === 'new') {
+            existing.hidden = true;
+            novel.hidden = false;
+        } else {
+            existing.hidden = false;
+            novel.hidden = true;
+        }
+    }
+
+    if (existing && novel) {
+        radios.forEach(r => r.addEventListener('change', updateMode));
+        updateMode();
+    }
+
+    const nameChipConfigs = [
+        { searchId: 'id_publisher_search', hiddenId: 'id_new_publishers', chipsId: 'id_publisher_chips', suggestionsId: 'id_publisher-suggestions' },
+        { searchId: 'id_editor_search', hiddenId: 'id_new_editors', chipsId: 'id_editor_chips', suggestionsId: 'id_editor-suggestions' },
+    ];
+
+    function readNames(hiddenEl) {
+        const raw = (hiddenEl && hiddenEl.value || '').trim();
+        if (!raw) return [];
+        try {
+            return JSON.parse(raw);
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function writeNames(hiddenEl, items) {
+        if (hiddenEl) {
+            hiddenEl.value = JSON.stringify(items);
+        }
+    }
+
+    function renderNameChips(config) {
+        const chipsEl = document.getElementById(config.chipsId);
+        const hiddenEl = document.getElementById(config.hiddenId);
+        if (!chipsEl || !hiddenEl) return;
+        const items = readNames(hiddenEl);
+        chipsEl.replaceChildren();
+        items.forEach(function (item, index) {
+            const chip = document.createElement('span');
+            chip.className = 'name-chip';
+            chip.title = item.name;
+
+            const label = document.createElement('span');
+            label.className = 'name-chip__label';
+            label.textContent = item.name;
+            chip.appendChild(label);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'name-chip__remove';
+            removeBtn.setAttribute('aria-label', 'إزالة ' + item.name);
+            removeBtn.textContent = '×';
+            removeBtn.dataset.index = index;
+
+            chip.appendChild(removeBtn);
+            chipsEl.appendChild(chip);
+        });
+    }
+
+    function addNameChip(config, name) {
+        const hiddenEl = document.getElementById(config.hiddenId);
+        const chipsEl = document.getElementById(config.chipsId);
+        const searchEl = document.getElementById(config.searchId);
+        if (!hiddenEl || !name) return;
+        const items = readNames(hiddenEl);
+        if (items.some(function (item) { return item.name === name; })) return;
+        items.push({ name: name });
+        writeNames(hiddenEl, items);
+        renderNameChips(config);
+        if (searchEl) {
+            searchEl.value = '';
+            searchEl.focus();
+        }
+        const suggestionsEl = document.getElementById(config.suggestionsId);
+        if (suggestionsEl) {
+            suggestionsEl.replaceChildren();
+        }
+    }
+
+    function commitNameInput(config) {
+        const searchEl = document.getElementById(config.searchId);
+        if (!searchEl) return;
+        const raw = searchEl.value.trim();
+        if (!raw) return;
+        const names = raw.split(/,|،/).map(function (n) { return n.trim(); }).filter(Boolean);
+        names.forEach(function (name) {
+            addNameChip(config, name);
+        });
+    }
+
+    nameChipConfigs.forEach(function (config) {
+        renderNameChips(config);
+        const chipsEl = document.getElementById(config.chipsId);
+        if (chipsEl) {
+            chipsEl.addEventListener('click', function (event) {
+                const btn = event.target.closest('.name-chip__remove');
+                if (!btn) return;
+                const hiddenEl = document.getElementById(config.hiddenId);
+                const items = readNames(hiddenEl);
+                items.splice(parseInt(btn.dataset.index, 10), 1);
+                writeNames(hiddenEl, items);
+                renderNameChips(config);
+            });
+        }
+        const searchEl = document.getElementById(config.searchId);
+        if (searchEl) {
+            searchEl.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ',' || event.key === '،') {
+                    event.preventDefault();
+                    commitNameInput(config);
+                }
+            });
+        }
+    });
+
+    document.addEventListener('click', function (event) {
+        const addBtn = event.target.closest('.chip-add-btn');
+        if (addBtn) {
+            const config = nameChipConfigs.find(function (c) { return c.searchId === addBtn.dataset.field; });
+            if (config) {
+                event.preventDefault();
+                commitNameInput(config);
+            }
+            return;
+        }
+
+        const item = event.target.closest('.autocomplete-item');
+        if (!item) return;
+        event.preventDefault();
+        const fieldId = item.dataset.field;
+        const chipConfig = nameChipConfigs.find(function (c) { return c.searchId === fieldId; });
+        if (chipConfig) {
+            addNameChip(chipConfig, item.dataset.value);
+        }
+    });
+})();
+</script>
+{% endblock %}

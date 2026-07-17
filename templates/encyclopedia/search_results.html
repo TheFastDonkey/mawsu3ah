@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}نتائج البحث{% if query %} عن “{{ query }}”{% endif %}{% endblock %}
+
+{% block meta_description %}نتائج البحث{% if query %} عن “{{ query }}”{% endif %} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+{% block og_title %}نتائج البحث{% if query %} عن “{{ query }}”{% endif %}{% endblock %}
+{% block canonical_url %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'search' %}{% if query %}?q={{ query|urlencode }}{% if category_slug %}&category={{ category_slug|urlencode }}{% endif %}{% endif %}">{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>نتائج البحث</h1>
+</section>
+
+<form class="filter-bar search-form" action="{% url 'search' %}" method="get">
+    <input type="search" name="q" value="{{ query }}" placeholder="ابحث عن كتاب أو مؤلف..." aria-label="بحث">
+    <select name="category" aria-label="تصنيف">
+        <option value="">كل التصنيفات</option>
+        {% for cat in categories %}
+        <option
+            value="{{ cat.slug }}"
+            {% if cat.slug == category_slug %}selected{% endif %}
+            class="category-filter-option category-filter-option--level-{{ cat.level }}"
+        >{% for i in ""|rjust:cat.level %}— {% endfor %}{{ cat.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">بحث</button>
+</form>
+
+<p class="result-count">{{ count }} نتيجة</p>
+
+{% if page_obj %}
+<div class="edition-grid">
+    {% for book in page_obj %}
+    <article class="edition-card">
+        <h3><a href="{% url 'book_detail' book.slug %}">{{ book.title }}</a></h3>
+        <p class="edition-author">{% name_links book.authors.all "author" %}</p>
+        {% if book.categories.all %}
+        <p class="edition-publisher">{% for category in book.categories.all %}{{ category.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+        {% endif %}
+    </article>
+    {% endfor %}
+</div>
+
+{% include "encyclopedia/partials/pagination.html" with page_obj=page_obj query=query category_slug=category_slug %}
+{% else %}
+<p class="empty-state">لا توجد نتائج مطابقة.</p>
+{% endif %}
+{% endblock %}

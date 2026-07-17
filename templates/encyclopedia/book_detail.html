@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block meta_description %}طبعات كتاب {{ book.title }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+{% block og_title %}{{ book.title }}{% endblock %}
+{% block og_description %}اطلع على أفضل طبعات كتاب {{ book.title }} وقارن بينها.{% endblock %}
+{% block canonical_url %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'book_detail' book.slug %}">{% endblock %}
+
+{% block content %}
+<article class="book-header">
+    <div class="book-categories">
+        <div id="book-categories-kicker">
+            {% include "encyclopedia/partials/book_categories_kicker.html" %}
+        </div>
+        <div id="category-suggestion-form"></div>
+        <div
+            aria-hidden="true"
+            hx-get="{% url 'book_categories_kicker' book.slug %}"
+            hx-trigger="refreshCategoryKicker from:body"
+            hx-target="#book-categories-kicker"
+            hx-swap="innerHTML"
+        ></div>
+    </div>
+
+    {% if request.user.is_authenticated and has_pending_link_suggestion %}
+        <p class="c-alert c-alert--info">لديك اقتراح ربط طبعة قيد المراجعة.</p>
+    {% endif %}
+
+    <div class="book-actions">
+        {% url 'submit_edition' as submit_edition_url %}
+        {% with book_pk=book.pk|stringformat:'s' %}
+        {% with edition_submit_url=submit_edition_url|add:'?book='|add:book_pk %}
+        {% if request.user.is_authenticated %}
+            <a
+                class="c-button c-button--primary c-button--sm"
+                href="{{ edition_submit_url }}"
+            >اقترح طبعة</a>
+        {% else %}
+            <a
+                class="c-button c-button--primary c-button--sm"
+                href="{% url 'login' %}?next={{ edition_submit_url|urlencode }}"
+            >اقترح طبعة</a>
+        {% endif %}
+        {% if request.user.is_authenticated %}
+            <button
+                class="c-button c-button--ghost c-button--sm"
+                hx-get="{% url 'suggest_edition_link' book.slug %}"
+                hx-target="#edition-link-suggestion-form"
+                hx-swap="innerHTML"
+            >اقترح ربط طبعة</button>
+            <div id="edition-link-suggestion-form"></div>
+        {% endif %}
+        {% endwith %}
+        {% endwith %}
+    </div>
+
+    <h1>{{ book.title }}</h1>
+    <p class="book-author">{% name_links book.authors.all "author" %}</p>
+    {% if book.alias_list %}
+    <p class="book-aliases">أسماء بديلة: {{ book.aliases }}</p>
+    {% endif %}
+    {% if book.disambiguation %}
+    <p class="book-disambiguation">{{ book.disambiguation }}</p>
+    {% endif %}
+</article>
+
+<section class="editions-section">
+    <div class="editions-section__header">
+        <h2>الطبعات المعتمدة</h2>
+        <div class="editions-section__actions">
+            <a
+                href="?expert_first={% if expert_first %}0{% else %}1{% endif %}"
+                class="c-button c-button--sm c-button--secondary"
+            >
+                {% if expert_first %}الترتيب العادي{% else %}الأفضل أولاً{% endif %}
+            </a>
+            <a
+                href="?original_only={% if original_only %}0{% else %}1{% endif %}"
+                class="c-button c-button--sm c-button--secondary"
+            >
+                {% if original_only %}إظهار الكل{% else %}إظهار الأصلية فقط{% endif %}
+            </a>
+        </div>
+    </div>
+    {% if editions %}
+    <div class="edition-grid">
+        {% for edition in editions %}
+        {% include "encyclopedia/partials/edition_list_item.html" %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">لا توجد طبعات معتمدة لهذا الكتاب بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

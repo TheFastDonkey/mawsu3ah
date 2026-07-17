@@ -1,0 +1,24 @@
+{% comment %}
+  Button component.
+
+  Props:
+    label    (required) — visible text.
+    type     — button | submit | reset (default: button).
+    variant  — primary | secondary | danger | ghost | link (default: primary).
+    size     — sm | md | lg (default: md).
+    class    — extra CSS classes.
+    attrs    — extra HTML attributes as a string.
+    href     — if provided, renders an <a> instead of <button>.
+    disabled — boolean.
+{% endcomment %}
+{% with variant=variant|default:"primary" size=size|default:"md" %}
+  {% if href %}
+    <a href="{{ href }}" class="c-button c-button--{{ variant }} c-button--{{ size }}{% if class %} {{ class }}{% endif %}"{% if attrs %} {{ attrs }}{% endif %}{% if disabled %} aria-disabled="true" tabindex="-1"{% endif %}>
+      {{ label }}
+    </a>
+  {% else %}
+    <button type="{{ type|default:"button" }}" class="c-button c-button--{{ variant }} c-button--{{ size }}{% if class %} {{ class }}{% endif %}"{% if attrs %} {{ attrs }}{% endif %}{% if disabled %} disabled{% endif %}>
+      {{ label }}
+    </button>
+  {% endif %}
+{% endwith %}

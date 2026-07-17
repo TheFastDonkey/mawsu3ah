@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}المؤلفون — الموسوعة الكبرى{% endblock %}
+{% block meta_description %}تصفح قائمة المؤلفين في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>المؤلفون</h1>
+    <p class="page-subtitle">المؤلفون الذين لديهم كتب معتمدة في الموسوعة.</p>
+</section>
+
+<section class="content-section">
+    {% if page_obj.object_list %}
+    <ul class="book-list">
+        {% for author in page_obj %}
+        <li class="book-list__item">
+            <a href="{% url 'author_detail' author.slug %}">{{ author.name }}</a>
+            <span class="book-list__count">{{ author.book_count }} كتاب</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% include "components/core/pagination.html" with page_obj=page_obj %}
+    {% else %}
+    <p class="empty-state">لا يوجد مؤلفون معتمدون بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

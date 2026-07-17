@@ -1,0 +1,23 @@
+{% comment %}
+  Form field wrapper for a Django bound field.
+
+  Props:
+    field      (required) — the bound form field.
+    class      — extra CSS classes on the wrapper.
+    show_label — boolean (default True).
+    label_class — extra classes on the <label>.
+{% endcomment %}
+<div class="c-form-field{% if class %} {{ class }}{% endif %}">
+  {% if show_label|default_if_none:True %}
+    <label for="{{ field.id_for_label }}" class="c-form-field__label{% if label_class %} {{ label_class }}{% endif %}">{{ field.label }}{% if field.field.required %}<span class="required" aria-hidden="true">*</span>{% endif %}</label>
+  {% endif %}
+  {{ field }}
+  {% if field.help_text %}
+    <span class="c-form-field__help">{{ field.help_text }}</span>
+  {% endif %}
+  {% if field.errors %}
+    <ul class="c-form-field__errors">
+      {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>

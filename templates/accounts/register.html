@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}إنشاء حساب — الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+
+{% block content %}
+<h1>إنشاء حساب</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">إنشاء الحساب</button>
+</form>
+<div class="auth-links">
+    <p>لديك حساب؟ <a href="{% url 'login' %}">سجّل الدخول</a></p>
+</div>
+{% endblock %}

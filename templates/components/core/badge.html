@@ -1,0 +1,9 @@
+{% comment %}
+  Badge component.
+
+  Props:
+    label   (required) — badge text.
+    variant — default | expert | success | warning | danger (default: default).
+    class   — extra CSS classes.
+{% endcomment %}
+<span class="c-badge c-badge--{{ variant|default:"default" }}{% if class %} {{ class }}{% endif %}">{{ label }}</span>

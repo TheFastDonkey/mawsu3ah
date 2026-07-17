@@ -1,0 +1,7 @@
+طلب تصنيف جديد
+
+المستخدم: {{ user.get_full_name|default:user.email }} ({{ user.email }})
+اسم التصنيف المطلوب: {{ category_request.name }}
+
+راجع الطلب في لوحة الإدارة:
+{{ url }}

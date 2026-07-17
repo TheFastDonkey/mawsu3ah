@@ -1,0 +1,18 @@
+{% comment %}
+  Standalone textarea component.
+
+  Props:
+    name      (required)
+    value
+    placeholder
+    label
+    id
+    rows      — default 4.
+    class     — extra CSS classes.
+    attrs     — extra HTML attributes as a string.
+    required  — boolean.
+{% endcomment %}
+<div class="c-form-field{% if class %} {{ class }}{% endif %}">
+  {% if label %}<label for="{{ id|default:name }}" class="c-form-field__label">{{ label }}</label>{% endif %}
+  <textarea name="{{ name }}" id="{{ id|default:name }}" class="c-textarea" rows="{{ rows|default:4 }}"{% if placeholder %} placeholder="{{ placeholder }}"{% endif %}{% if required %} required{% endif %}{% if attrs %} {{ attrs }}{% endif %}>{% if value %}{{ value }}{% endif %}</textarea>
+</div>

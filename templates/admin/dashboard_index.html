@@ -1,0 +1,35 @@
+{% extends "admin/index.html" %}
+{% load i18n encyclopedia_extras %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module admin-dashboard-module">
+    <table class="admin-dashboard-table">
+      <caption><h2 class="admin-dashboard-title">طلبات المراجعة المعلقة</h2></caption>
+      <tbody>
+        <tr>
+          <td>
+            <p class="admin-dashboard-text">
+              <strong>{{ pending_total }}</strong> طلب في انتظار المراجعة.
+            </p>
+            <p class="admin-dashboard-text">
+              <a href="{% url 'admin:moderation_dashboard' %}">عرض كل الطلبات المعلقة</a>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ul class="admin-dashboard-stats">
+              {% for key, label in pending_labels.items %}
+              <li><span class="mini quiet">{{ label }}: {{ pending_counts|get_item:key }}</span></li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}

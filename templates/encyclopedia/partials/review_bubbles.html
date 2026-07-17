@@ -1,0 +1,18 @@
+{% if edition.review_count %}
+<div class="review-bubbles">
+    {% for review in edition.review_bubbles %}
+    <div class="review-bubble">
+        <div class="review-bubble__avatar" aria-hidden="true">{{ review.user.username|first }}</div>
+        <div class="review-bubble__content">
+            <p class="review-bubble__text">{{ review.body }}</p>
+            <div class="review-bubble__meta">
+                {{ review.user.username }}
+                {% if review.user.is_expert %}<span class="review-bubble__badge">خبير</span>{% endif %}
+                {% if review.vote_score %}· {{ review.vote_score }}{% endif %}
+                · {{ review.created_at|date:"Y/m/d · H:i" }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

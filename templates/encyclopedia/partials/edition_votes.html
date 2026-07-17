@@ -1,0 +1,22 @@
+{% load encyclopedia_extras %}
+<div class="edition-votes" data-container-id="edition-votes-container-{{ edition.public_id }}">
+    <h4 class="edition-votes__title">
+        {% include "components/core/icon.html" with name="users" size=16 %}
+        من صوّت على هذه الطبعة ({{ votes|length }})
+    </h4>
+    {% if votes %}
+    <ul class="edition-votes__list">
+        {% for vote in votes %}
+        <li>
+            {% user_name vote.user %}
+            <span class="edition-votes__direction" aria-label="{% if vote.value == 1 %}إعجاب{% else %}عدم إعجاب{% endif %}">
+                {% include "components/core/icon.html" with name="thumbs-up" size=14 %}
+            </span>
+            <span class="edition-votes__time">{{ vote.created_at|date:"Y/m/d" }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="edition-votes__empty">لا توجد تصويتات بعد.</p>
+    {% endif %}
+</div>

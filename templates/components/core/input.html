@@ -1,0 +1,18 @@
+{% comment %}
+  Standalone input component.
+
+  Props:
+    name      (required)
+    type      — text | email | password | search | number | url | tel (default: text).
+    value
+    placeholder
+    label
+    id
+    class     — extra CSS classes.
+    attrs     — extra HTML attributes as a string.
+    required  — boolean.
+{% endcomment %}
+<div class="c-form-field{% if class %} {{ class }}{% endif %}">
+  {% if label %}<label for="{{ id|default:name }}" class="c-form-field__label">{{ label }}</label>{% endif %}
+  <input type="{{ type|default:"text" }}" name="{{ name }}" id="{{ id|default:name }}" class="c-input"{% if value %} value="{{ value }}"{% endif %}{% if placeholder %} placeholder="{{ placeholder }}"{% endif %}{% if required %} required{% endif %}{% if attrs %} {{ attrs }}{% endif %}>
+</div>

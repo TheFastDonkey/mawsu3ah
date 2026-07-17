@@ -1,0 +1,13 @@
+<ul class="category-tree__level">
+    {% for category in categories %}
+    <li class="category-tree__node">
+        <a class="category-tree__link" href="{{ category.get_absolute_url }}">
+            <span class="category-tree__name">{{ category.name }}</span>
+            <span class="category-tree__count">{{ category.subtree_book_count }} كتاب</span>
+        </a>
+        {% if category.children.all %}
+            {% include "encyclopedia/partials/category_tree_node.html" with categories=category.children.all %}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,18 @@
+{% comment %}
+  Card component.
+
+  Props:
+    title     — card heading.
+    subtitle  — secondary line.
+    meta      — small metadata line.
+    body      — main content (plain text; HTML passed here will be escaped).
+    footer    — footer content (plain text; HTML passed here will be escaped).
+    class     — extra CSS classes.
+{% endcomment %}
+<article class="c-card{% if class %} {{ class }}{% endif %}">
+  {% if title %}<h3 class="c-card__title">{{ title }}</h3>{% endif %}
+  {% if subtitle %}<p class="c-card__subtitle">{{ subtitle }}</p>{% endif %}
+  {% if meta %}<p class="c-card__meta">{{ meta }}</p>{% endif %}
+  {% if body %}<div class="c-card__body">{{ body }}</div>{% endif %}
+  {% if footer %}<div class="c-card__footer">{{ footer }}</div>{% endif %}
+</article>

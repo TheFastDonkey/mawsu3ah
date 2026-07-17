@@ -1,0 +1,25 @@
+{% load encyclopedia_extras %}
+{% if editions %}
+<ul class="search-suggestions">
+    {% for edition in editions %}
+    <li>
+        <a
+            href="#"
+            class="autocomplete-item"
+            data-field="{{ field_id|default:'id_edition' }}"
+            data-value="{{ edition.public_id }}"
+            data-text-field="{{ text_field_id|default:'id_edition_search' }}"
+            data-display="{{ edition.book.title }}{% if edition.year %} — {{ edition.year }}{% endif %}"
+        >
+            <span class="suggestion-title">{{ edition.book.title }}</span>
+            <span class="suggestion-meta">
+                {% name_links edition.publishers.all "publisher" %}
+                {% if edition.year %} · {{ edition.year }}{% endif %}
+            </span>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% elif query %}
+<p class="search-suggestions-empty">لا توجد نتائج</p>
+{% endif %}

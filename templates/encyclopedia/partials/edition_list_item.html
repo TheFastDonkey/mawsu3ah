@@ -1,0 +1,63 @@
+{% load encyclopedia_extras %}
+<article class="edition-card edition-list-item">
+    {% if edition.cover_image %}
+    <img src="{{ edition.cover_image.url }}" alt="" class="edition-card__thumb" loading="lazy">
+    {% endif %}
+    <div class="edition-list-item__body">
+    <h3><a href="{% url 'edition_detail' edition.book.slug edition.public_id %}">{{ edition.book.title }}</a></h3>
+    {% with relation=edition.related_sources.first %}
+    {% if relation %}
+    <p class="edition-card__relation-badge">
+        {% if relation.kind == "photocopy" %}طبعة مصورة{% elif relation.kind == "reprint" %}إعادة طبع{% endif %}
+    </p>
+    {% endif %}
+    {% endwith %}
+    {% if edition.related_targets.exists %}
+    <p class="edition-card__relation-hints">
+        {% regroup edition.related_targets.all by kind as relation_groups %}
+        {% for group in relation_groups %}
+        <span>
+            {% if group.grouper == "photocopy" %}له طبعات مصورة{% elif group.grouper == "reprint" %}أعيد طبعه{% endif %}
+        </span>
+        {% endfor %}
+    </p>
+    {% endif %}
+    <p class="edition-meta">{% name_links edition.book.authors.all "author" %}</p>
+    {% if edition.editors.all %}
+    <p class="edition-meta">تحقيق: {% name_links edition.editors.all "editor" %}</p>
+    {% endif %}
+    <p class="edition-meta">{% name_links edition.publishers.all "publisher" %}{% if edition.year %} · {{ edition.year }}{% endif %}</p>
+    {% if edition.volumes %}
+    <p class="edition-meta">المجلدات: {{ edition.volumes }}</p>
+    {% endif %}
+    {% if edition.page_count %}
+    <p class="edition-meta">عدد الصفحات: {{ edition.page_count }}</p>
+    {% endif %}
+    {% if edition.city %}
+    <p class="edition-meta">مدينة النشر: {{ edition.city }}</p>
+    {% endif %}
+    <p class="edition-submitter">
+        مقدمة من {% user_name edition.submitted_by %}
+        · {{ edition.submitted_at|date:"Y/m/d" }}
+        {% if edition.submitted_by.is_expert and edition.is_best %}
+            <span class="edition-card__expert-like" aria-label="رشحها خبير">
+                {% include "components/core/icon.html" with name="award" size=14 %}
+                رشحها خبير
+            </span>
+        {% endif %}
+    </p>
+
+    {% include "encyclopedia/partials/review_bubbles.html" with edition=edition %}
+
+    <div class="edition-footer">
+        {% include "encyclopedia/partials/edition_vote_buttons.html" with edition=edition user_vote=edition.user_vote context_book=context_book %}
+        {% if edition.review_count %}
+        <a class="review-count-link" href="{% url 'edition_detail' edition.book.slug edition.public_id %}">
+            {{ edition.review_count }} مراجعة{% if edition.review_count != 1 %}ات{% endif %}
+        </a>
+        {% else %}
+        <span class="review-count-link review-count-link--muted">لا مراجعات</span>
+        {% endif %}
+    </div>
+    </div>
+</article>

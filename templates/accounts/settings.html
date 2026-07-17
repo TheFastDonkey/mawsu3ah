@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}إعدادات الحساب — الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+
+{% load encyclopedia_extras %}
+
+{% block content %}
+<h1 class="page-title">إعدادات الحساب</h1>
+
+<form method="post" class="settings-form">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="c-form-field">
+      <label for="{{ field.id_for_label }}" class="c-form-field__label">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}
+        <span class="c-form-field__help">{{ field.help_text }}</span>
+      {% endif %}
+      {% if field.errors %}
+        <ul class="c-form-field__errors">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+  {% endfor %}
+  <div class="form-actions">
+    <button type="submit" class="c-button c-button--primary c-button--md">حفظ التغييرات</button>
+    <a href="{% url 'profile_edit' %}" class="c-button c-button--secondary c-button--md">تعديل الملف الشخصي</a>
+  </div>
+</form>
+{% endblock %}

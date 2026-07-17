@@ -1,0 +1,16 @@
+{% if suggestions %}
+<ul class="search-suggestions">
+    {% for value in suggestions %}
+    <li>
+        <a
+            href="#"
+            class="autocomplete-item"
+            data-field="{{ field_id }}"
+            data-value="{{ value }}"
+        >{{ value }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% elif query %}
+<p class="search-suggestions-empty">لا توجد نتائج</p>
+{% endif %}

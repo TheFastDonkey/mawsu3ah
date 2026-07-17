@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}تسجيل الدخول — الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+
+{% block content %}
+<h1>تسجيل الدخول</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">دخول</button>
+</form>
+<div class="auth-links">
+    <p><a href="{% url 'magic_link_request' %}">الدخول برابط سريع</a></p>
+    <p><a href="{% url 'password_reset' %}">نسيت كلمة المرور؟</a></p>
+    <p>ليس لديك حساب؟ <a href="{% url 'register' %}">سجّل الآن</a></p>
+</div>
+{% endblock %}

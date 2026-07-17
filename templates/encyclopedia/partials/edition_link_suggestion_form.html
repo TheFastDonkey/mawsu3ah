@@ -1,0 +1,51 @@
+<form
+    class="edition-link-suggestion-form"
+    hx-post="{% url 'suggest_edition_link' book.slug %}"
+    hx-target="this"
+    hx-swap="outerHTML"
+>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+        {% include "components/core/alert.html" with message=error type="error" %}
+    {% endfor %}
+
+    <div class="form-field">
+        <label for="id_edition_search">الطبعة</label>
+        <input
+            type="text"
+            id="id_edition_search"
+            name="edition_search"
+            class="c-input"
+            placeholder="ابدأ بعنوان الكتاب أو الناشر أو سنة النشر..."
+            autocomplete="off"
+            hx-get="{% url 'edition_suggestions' %}"
+            hx-trigger="keyup changed delay:300ms"
+            hx-target="#id_edition-suggestions"
+            hx-indicator="#id_edition-indicator"
+        >
+        <span id="id_edition-indicator" class="htmx-indicator">جارٍ البحث…</span>
+        <div id="id_edition-suggestions" class="suggestions-dropdown"></div>
+        {% for error in form.edition.errors %}
+            {% include "components/core/alert.html" with message=error type="error" %}
+        {% endfor %}
+        <input type="hidden" name="edition" id="id_edition" value="{{ form.edition.value|default:'' }}">
+    </div>
+
+    <div class="form-field">
+        <label for="id_role">العلاقة</label>
+        {{ form.role }}
+        {% for error in form.role.errors %}
+            {% include "components/core/alert.html" with message=error type="error" %}
+        {% endfor %}
+    </div>
+
+    <div class="form-field">
+        <label for="id_reason">سبب الربط (اختياري)</label>
+        {{ form.reason }}
+        {% for error in form.reason.errors %}
+            {% include "components/core/alert.html" with message=error type="error" %}
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="c-button c-button--primary c-button--sm">إرسال الاقتراح</button>
+</form>

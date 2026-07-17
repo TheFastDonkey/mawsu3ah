@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+{% load encyclopedia_extras %}
+
+{% block title %}{{ edition.book.title }} — طبعة {{ edition.publisher }} (تصميم ١){% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/test-variants.css' %}?v=2">
+{% endblock %}
+
+{% block content %}
+<div class="edition-variant-1">
+    <nav class="variant-switcher" aria-label="تبديل التصميم التجريبي">
+        <span class="variant-switcher__label">التصميم التجريبي (محفوظ):</span>
+        <a href="{% url 'edition_detail_v1' %}" class="is-active" aria-current="page">١</a>
+        <a href="{% url 'edition_detail' edition.book.slug edition.public_id %}">الرئيسي</a>
+    </nav>
+
+    <nav class="edition-breadcrumb" aria-label="مسار التنقل">
+        {% with primary=edition.book.primary_category %}
+        {% if primary %}
+        <a href="{{ primary.get_absolute_url }}">{{ primary.name }}</a>
+        <span aria-hidden="true">/</span>
+        {% endif %}
+        {% endwith %}
+        <a href="{% url 'book_detail' edition.book.slug %}">{{ edition.book.title }}</a>
+        <span aria-hidden="true">/</span>
+        <span>طبعة {{ edition.publisher }}</span>
+    </nav>
+
+    <header class="edition-hero">
+        <h1>{{ edition.book.title }}</h1>
+        <p class="edition-hero__author">{% name_link edition.book.author "author" edition.author_slug %}</p>
+        {% if edition.editor %}
+        <p class="edition-hero__editor">تحقيق {% name_link edition.editor "editor" edition.editor_slug %}</p>
+        {% endif %}
+        <p class="edition-hero__publisher">
+            {% name_link edition.publisher "publisher" edition.publisher_slug %}{% if edition.year %} · {{ edition.year }}{% endif %}
+        </p>
+    </header>
+
+    <div class="edition-layout">
+        <div class="edition-main">
+            <dl class="edition-facts">
+                {% if edition.volumes %}
+                <div class="edition-fact">
+                    <dt class="edition-fact__label">المجلدات</dt>
+                    <dd class="edition-fact__value">{{ edition.volumes }}</dd>
+                </div>
+                {% endif %}
+                {% if edition.page_count %}
+                <div class="edition-fact">
+                    <dt class="edition-fact__label">عدد الصفحات</dt>
+                    <dd class="edition-fact__value">{{ edition.page_count }}</dd>
+                </div>
+                {% endif %}
+                {% if edition.city %}
+                <div class="edition-fact">
+                    <dt class="edition-fact__label">مدينة النشر</dt>
+                    <dd class="edition-fact__value">{{ edition.city }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+
+            <div class="edition-provenance">
+                <span class="edition-provenance__meta">
+                    مقدمة من {% user_name edition.submitted_by %}
+                    · {{ edition.submitted_at|date:"Y/m/d" }}
+                    {% if edition.liked_by_expert %}
+                    <span class="expert-like-badge">
+                        {% include "components/core/icon.html" with name="award" size=14 %}
+                        أعجب بها خبير
+                    </span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="edition-actions">
+                <div class="vote-group-wrapper">
+                    {% include "encyclopedia/partials/edition_vote_buttons.html" %}
+                    <button
+                        type="button"
+                        class="vote-viewer"
+                        data-votes-url="{% url 'edition_votes' edition.book.slug edition.public_id %}"
+                        data-container-id="edition-votes-container-{{ edition.public_id }}"
+                        aria-label="عرض من صوّت على هذه الطبعة"
+                    >
+                        {% include "components/core/icon.html" with name="users" size=16 %}
+                    </button>
+                </div>
+                <div id="edition-votes-container-{{ edition.public_id }}" class="edition-votes-container"></div>
+            </div>
+        </div>
+
+        {% if edition.cover_image %}
+        <figure class="edition-cover">
+            <img src="{{ edition.cover_image.url }}" alt="غلاف طبعة {{ edition.publisher }} لكتاب {{ edition.book.title }}" loading="lazy">
+        </figure>
+        {% endif %}
+    </div>
+
+    {% include "encyclopedia/partials/comment_list.html" %}
+</div>
+{% endblock %}

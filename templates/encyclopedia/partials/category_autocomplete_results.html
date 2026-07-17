@@ -1,0 +1,24 @@
+{% if categories %}
+<ul class="category-autocomplete__list">
+    {% for category in categories %}
+    <li>
+        <button
+            type="button"
+            class="category-autocomplete__item"
+            data-category-id="{{ category.pk }}"
+            data-category-name="{{ category.name }}"
+        >
+            <span class="category-autocomplete__name">{{ category.name }}</span>
+            {% if category.url_path %}
+            <span class="category-autocomplete__path">{{ category.url_path }}</span>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="category-autocomplete__empty">
+    لا يوجد تصنيف بهذا الاسم.
+    <a href="{% url 'category_list' %}#suggest-category">تصفّح التصنيفات واقترح جديداً</a>.
+</p>
+{% endif %}

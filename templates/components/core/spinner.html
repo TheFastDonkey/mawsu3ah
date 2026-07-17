@@ -1,0 +1,8 @@
+{% comment %}
+  Loading spinner component.
+
+  Props:
+    label — accessible label (default: "جارٍ التحميل...").
+    class — extra CSS classes.
+{% endcomment %}
+<span class="c-spinner{% if class %} {{ class }}{% endif %}" role="status" aria-label="{{ label|default:"جارٍ التحميل..." }}"></span>

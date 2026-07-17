@@ -1,0 +1,65 @@
+{% comment %}
+  Site-wide sidebar menu.
+
+  Expects:
+    - sidebar_roots: top-level Category instances with prefetched children
+      and subtree_book_count annotated on each category.
+{% endcomment %}
+<nav class="site-sidebar" data-collapsed="false" aria-label="القائمة الجانبية">
+    <div class="site-sidebar__header">
+        <span class="site-sidebar__title">القائمة</span>
+        <button
+            type="button"
+            class="site-sidebar__toggle"
+            id="sidebar-toggle"
+            aria-label="إظهار/إخفاء القائمة"
+            aria-expanded="false"
+            aria-controls="sidebar-content"
+        >
+            <i data-lucide="chevron-right" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div class="site-sidebar__content" id="sidebar-content">
+        <section class="site-sidebar__section" aria-labelledby="sidebar-browse-title">
+            <h2 id="sidebar-browse-title" class="site-sidebar__section-title">تصفح</h2>
+            <ul class="site-sidebar__links">
+                <li><a href="{% url 'home' %}">الرئيسية</a></li>
+                <li><a href="{% url 'submit_edition' %}">ترشيح طبعة</a></li>
+                <li><a href="{% url 'about' %}">من نحن</a></li>
+                <li><a href="{% url 'contact' %}">تواصل معنا</a></li>
+            </ul>
+        </section>
+
+        {% include "components/core/category_tree.html" %}
+
+        <section class="site-sidebar__section site-sidebar__section--tight" aria-labelledby="sidebar-authors-title">
+            <h2 id="sidebar-authors-title" class="site-sidebar__section-title">
+                <a href="{% url 'author_list' %}">المؤلفون</a>
+            </h2>
+        </section>
+
+        <section class="site-sidebar__section site-sidebar__section--tight" aria-labelledby="sidebar-editors-title">
+            <h2 id="sidebar-editors-title" class="site-sidebar__section-title">
+                <a href="{% url 'editor_list' %}">المحققون</a>
+            </h2>
+        </section>
+
+        <section class="site-sidebar__section site-sidebar__section--tight" aria-labelledby="sidebar-publishers-title">
+            <h2 id="sidebar-publishers-title" class="site-sidebar__section-title">
+                <a href="{% url 'publisher_list' %}">الناشرون</a>
+            </h2>
+        </section>
+
+        {% if request.user.is_staff %}
+        <section class="site-sidebar__section" aria-labelledby="sidebar-staff-title">
+            <h2 id="sidebar-staff-title" class="site-sidebar__section-title">إدارة</h2>
+            <ul class="site-sidebar__links">
+                <li><a href="{% url 'moderation:moderation_dashboard' %}">لوحة المراجعة</a></li>
+                <li><a href="{% url 'moderation:moderation_comments' %}">المراجعات</a></li>
+                <li><a href="{% url 'moderation:report_queue' %}">البلاغات</a></li>
+            </ul>
+        </section>
+        {% endif %}
+    </div>
+</nav>

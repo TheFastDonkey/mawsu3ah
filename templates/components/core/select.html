@@ -1,0 +1,21 @@
+{% comment %}
+  Standalone select component.
+
+  Props:
+    name      (required)
+    options   (required) — iterable of (value, label) tuples.
+    selected
+    label
+    id
+    class     — extra CSS classes.
+    attrs     — extra HTML attributes as a string.
+    required  — boolean.
+{% endcomment %}
+<div class="c-form-field{% if class %} {{ class }}{% endif %}">
+  {% if label %}<label for="{{ id|default:name }}" class="c-form-field__label">{{ label }}</label>{% endif %}
+  <select name="{{ name }}" id="{{ id|default:name }}" class="c-select"{% if required %} required{% endif %}{% if attrs %} {{ attrs }}{% endif %}>
+    {% for value, label in options %}
+      <option value="{{ value }}"{% if value == selected %} selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+</div>

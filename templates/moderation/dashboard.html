@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}لوحة المراجعة — الموسوعة الكبرى{% endblock %}
+
+{% block content %}
+<header class="section-header">
+    <h1>لوحة المراجعة</h1>
+    <nav class="sub-nav">
+        <a href="{% url 'moderation:moderation_dashboard' %}" class="c-button c-button--secondary c-button--sm">كل الطلبات</a>
+        <a href="{% url 'moderation:moderation_comments' %}" class="c-button c-button--ghost c-button--sm">المراجعات</a>
+        <a href="{% url 'moderation:report_queue' %}" class="c-button c-button--ghost c-button--sm">البلاغات</a>
+    </nav>
+</header>
+
+<section class="moderation-filters">
+    <div class="c-card">
+        <div class="c-card__body moderation-filters__body">
+            <span class="c-card__meta">تصفية حسب النوع:</span>
+            <a href="{% url 'moderation:moderation_dashboard' %}" class="c-badge {% if type_filter == 'all' %}c-badge--primary{% else %}c-badge--secondary{% endif %}">
+                الكل ({{ total_count }})
+            </a>
+            {% for type_key, type_label in type_labels.items %}
+            <a href="?type={{ type_key }}" class="c-badge {% if type_filter == type_key %}c-badge--primary{% else %}c-badge--secondary{% endif %}">
+                {{ type_label }} ({{ counts|get_item:type_key }})
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if page_obj.object_list %}
+    <p class="c-card__meta">{{ count }} طلب في الانتظار</p>
+    <div class="moderation-list">
+        {% for item in page_obj.object_list %}
+        <article class="c-card moderation-item" data-type="{{ item.type }}">
+            <div class="c-card__body">
+                <div class="moderation-item__header">
+                    <span class="c-badge c-badge--secondary">{{ item.type_label }}</span>
+                    {% if item.timestamp %}
+                    <span class="c-card__meta">{{ item.timestamp|date:"Y/m/d H:i" }}</span>
+                    {% endif %}
+                </div>
+                <h2 class="c-card__title">
+                    <a href="{{ item.detail_url }}">{{ item.title }}</a>
+                </h2>
+                {% if item.description %}
+                <p class="c-card__subtitle">{{ item.description }}</p>
+                {% endif %}
+                <p class="c-card__meta">
+                    مقدّم من {% user_name item.submitter %}
+                </p>
+
+                {% if item.extra.duplicates %}
+                <div class="c-alert c-alert--warning">
+                    <strong>تنبيه:</strong> قد تكون هذه الطبعة مكررة:
+                    <ul>
+                        {% for dup in item.extra.duplicates %}
+                        <li><a href="{% url 'edition_detail' dup.book.slug dup.pk %}">{{ dup.publishers.all|join:"، " }} {% if dup.year %}({{ dup.year }}){% endif %}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="c-card__footer">
+                <form action="{{ item.approve_url }}" method="post" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="c-button c-button--primary c-button--sm">اعتمد</button>
+                </form>
+                <form action="{{ item.reject_url }}" method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="text" name="rejection_reason" class="c-input c-input--auto" placeholder="سبب الرفض (اختياري)">
+                    <button type="submit" class="c-button c-button--danger c-button--sm">ارفض</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% include "encyclopedia/partials/pagination.html" with page_obj=page_obj %}
+{% else %}
+    <div class="c-empty-state">
+        <h2 class="c-empty-state__title">لا توجد طلبات مراجعة</h2>
+        <p class="c-empty-state__text">كل الطلبات المعروضة تم معالجتها.</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}لوحة المراجعة — الموسوعة الكبرى{% endblock %}
+
+{% block content %}
+<header class="section-header">
+    <h1>لوحة المراجعة</h1>
+    <nav class="sub-nav">
+        <a href="{% url 'moderation:moderation_queue' %}" class="c-button c-button--secondary c-button--sm">طبعات قيد المراجعة</a>
+        <a href="{% url 'moderation:moderation_comments' %}" class="c-button c-button--ghost c-button--sm">المراجعات</a>
+        <a href="{% url 'moderation:report_queue' %}" class="c-button c-button--ghost c-button--sm">البلاغات</a>
+    </nav>
+</header>
+
+{% if page_obj.object_list %}
+    <p class="c-card__meta">{{ count }} طبعة في الانتظار</p>
+    <div class="moderation-list">
+        {% for item in page_obj.object_list %}
+        <article class="c-card">
+            <div class="c-card__body">
+                <h2 class="c-card__title">{{ item.edition.book.title }} — {% for author in item.edition.book.authors.all %}{{ author.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</h2>
+                <p class="c-card__subtitle">
+                    طبعة {{ item.edition.publishers.all|join:"، " }}
+                    {% if item.edition.year %}· {{ item.edition.year }}{% endif %}
+                    {% if item.edition.volumes %}· المجلدات {{ item.edition.volumes }}{% endif %}
+                </p>
+                <p class="c-card__meta">
+                    مقدمة من {% user_name item.edition.submitted_by %}
+                    · {{ item.edition.submitted_at|date:"Y/m/d" }}
+                    {% if item.edition.book.categories.all %}· {% for category in item.edition.book.categories.all %}{{ category.name }}{% if not forloop.last %}، {% endif %}{% endfor %}{% endif %}
+                </p>
+
+                {% if item.duplicates %}
+                <div class="c-alert c-alert--warning">
+                    <strong>تنبيه:</strong> قد تكون هذه الطبعة مكررة:
+                    <ul>
+                        {% for dup in item.duplicates %}
+                        <li><a href="{% url 'edition_detail' dup.book.slug dup.pk %}">{{ dup.publisher }} {% if dup.year %}({{ dup.year }}){% endif %}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="c-card__footer">
+                <form action="{% url 'moderation:approve_edition' item.edition.pk %}" method="post" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="c-button c-button--primary c-button--sm">اعتمد</button>
+                </form>
+                <form action="{% url 'moderation:reject_edition' item.edition.pk %}" method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="text" name="rejection_reason" class="c-input c-input--auto" placeholder="سبب الرفض (اختياري)">
+                    <button type="submit" class="c-button c-button--danger c-button--sm">ارفض</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% include "encyclopedia/partials/pagination.html" with page_obj=page_obj %}
+{% else %}
+    <div class="c-empty-state">
+        <h2 class="c-empty-state__title">لا توجد طلبات مراجعة</h2>
+        <p class="c-empty-state__text">كل الطبعات المعروضة تم اعتمادها.</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }} — الملف الشخصي{% endblock %}
+{% block meta_description %}ملف {{ profile_user.username }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
+
+{% load encyclopedia_extras %}
+
+{% block content %}
+<article class="profile">
+  <header class="profile__header">
+    <div class="profile__identity">
+      {% avatar profile_user size="lg" %}
+      <div class="profile__intro">
+        <h1 class="profile__name">
+          {{ profile_user.username }}
+          {% if profile_user.is_expert %}
+            {% include "components/core/badge.html" with label=profile_user.expert_label variant="expert" %}
+          {% endif %}
+        </h1>
+        {% if profile_user.profile.bio %}
+          <p class="profile__bio">{{ profile_user.profile.bio }}</p>
+        {% endif %}
+        <ul class="profile__meta">
+          {% if profile_user.profile.location %}
+            <li>
+              <i data-lucide="map-pin" aria-hidden="true"></i>
+              <span>{{ profile_user.profile.location }}</span>
+            </li>
+          {% endif %}
+          {% if profile_user.profile.website %}
+            <li>
+              <i data-lucide="globe" aria-hidden="true"></i>
+              <a href="{{ profile_user.profile.website }}" target="_blank" rel="noopener noreferrer">
+                {{ profile_user.profile.website|truncatechars:40 }}
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+        {% include "accounts/partials/social_links.html" with profile=profile_user.profile only %}
+      </div>
+    </div>
+
+    <dl class="profile__stats">
+      <div class="profile__stat">
+        <dt>طبعة معتمدة</dt>
+        <dd>{{ edition_count }}</dd>
+      </div>
+      <div class="profile__stat">
+        <dt>مراجعة</dt>
+        <dd>{{ review_count }}</dd>
+      </div>
+      <div class="profile__stat">
+        <dt>اقتراح تصنيف</dt>
+        <dd>{{ category_contrib_count }}</dd>
+      </div>
+      <div class="profile__stat">
+        <dt>اسم مقترح</dt>
+        <dd>{{ name_count }}</dd>
+      </div>
+      <div class="profile__stat">
+        <dt>اقتراح تعديل</dt>
+        <dd>{{ suggestion_count }}</dd>
+      </div>
+      <div class="profile__stat">
+        <dt>سمعة</dt>
+        <dd>{{ profile_user.reputation }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="profile__tabs" aria-label="تبويبات الملف الشخصي">
+    <a class="profile__tab{% if tab == 'editions' %} profile__tab--active{% endif %}" href="?tab=editions">
+      الطبعات المعتمدة
+      <span class="profile__tab-count">{{ edition_count }}</span>
+    </a>
+    <a class="profile__tab{% if tab == 'reviews' %} profile__tab--active{% endif %}" href="?tab=reviews">
+      المراجعات
+      <span class="profile__tab-count">{{ review_count }}</span>
+    </a>
+    <a class="profile__tab{% if tab == 'categories' %} profile__tab--active{% endif %}" href="?tab=categories">
+      التصنيفات
+      <span class="profile__tab-count">{{ category_contrib_count }}</span>
+    </a>
+    <a class="profile__tab{% if tab == 'names' %} profile__tab--active{% endif %}" href="?tab=names">
+      الأسماء المقترحة
+      <span class="profile__tab-count">{{ name_count }}</span>
+    </a>
+    <a class="profile__tab{% if tab == 'suggestions' %} profile__tab--active{% endif %}" href="?tab=suggestions">
+      اقتراحات التعديل
+      <span class="profile__tab-count">{{ suggestion_count }}</span>
+    </a>
+  </nav>
+
+  <section class="profile__panel" aria-labelledby="profile-tab-title">
+    <h2 id="profile-tab-title" class="visually-hidden">
+      {% if tab == 'editions' %}الطبعات المعتمدة{% elif tab == 'reviews' %}المراجعات{% elif tab == 'categories' %}التصنيفات{% elif tab == 'suggestions' %}اقتراحات التعديل{% else %}الأسماء المقترحة{% endif %}
+    </h2>
+
+    {% if tab == 'editions' %}
+      {% if items %}
+        <ul class="profile__list">
+          {% for edition in items %}
+            <li class="profile__item">
+              <a href="{{ edition.get_absolute_url }}" class="profile__item-title">{{ edition.book.title }}</a>
+              <p class="profile__item-meta">
+                {{ edition.publishers.all|join:"، " }}{% if edition.year %} — {{ edition.year }}{% endif %}
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+        {% include "components/core/pagination.html" with page_obj=items %}
+      {% else %}
+        <p class="profile__empty">لم يُعتمد أي طبعة بعد.</p>
+      {% endif %}
+
+    {% elif tab == 'reviews' %}
+      {% if items %}
+        <ul class="profile__list">
+          {% for review in items %}
+            <li class="profile__item">
+              <a href="{{ review.edition.get_absolute_url }}" class="profile__item-title">{{ review.edition.book.title }}</a>
+              <p class="profile__item-body">{{ review.body|truncatechars:200 }}</p>
+              <p class="profile__item-meta">{{ review.created_at|date:"Y/m/d" }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+        {% include "components/core/pagination.html" with page_obj=items %}
+      {% else %}
+        <p class="profile__empty">لا توجد مراجعات بعد.</p>
+      {% endif %}
+
+    {% elif tab == 'categories' %}
+      {% if category_suggestions or category_requests %}
+        {% if category_suggestions %}
+          <h3 class="profile__subheading">اقتراحات إضافة تصنيف لكتاب</h3>
+          <ul class="profile__list">
+            {% for suggestion in category_suggestions %}
+              <li class="profile__item">
+                <a href="{{ suggestion.book.get_absolute_url }}" class="profile__item-title">{{ suggestion.book.title }}</a>
+                <p class="profile__item-meta">
+                  التصنيف المقترح: {{ suggestion.name }}
+                  {% if suggestion.final_category %}(<a href="{{ suggestion.final_category.get_absolute_url }}">{{ suggestion.final_category.name }}</a>){% endif %}
+                  — <span class="c-badge c-badge--{% if suggestion.status == 'approved' %}success{% elif suggestion.status == 'rejected' %}danger{% else %}warning{% endif %}">{{ suggestion.get_status_display }}</span>
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% if category_requests %}
+          <h3 class="profile__subheading">طلبات تصنيفات جديدة</h3>
+          <ul class="profile__list">
+            {% for request in category_requests %}
+              <li class="profile__item">
+                <span class="profile__item-title">{{ request.name }}</span>
+                <p class="profile__item-meta">
+                  {% if request.final_category %}<a href="{{ request.final_category.get_absolute_url }}">{{ request.final_category.name }}</a> — {% endif %}
+                  <span class="c-badge c-badge--{% if request.status == 'approved' %}success{% elif request.status == 'rejected' %}danger{% else %}warning{% endif %}">{{ request.get_status_display }}</span>
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% else %}
+        <p class="profile__empty">لا توجد مساهمات في التصنيفات بعد.</p>
+      {% endif %}
+
+    {% elif tab == 'suggestions' %}
+      {% if edit_suggestions %}
+        <ul class="profile__list">
+          {% for suggestion in edit_suggestions %}
+            <li class="profile__item">
+              <a href="{{ suggestion.edition.get_absolute_url }}" class="profile__item-title">{{ suggestion.edition.book.title }}</a>
+              <p class="profile__item-meta">
+                {% if suggestion.proposed_publishers %}الناشرون: {{ suggestion.proposed_publishers|join:"، " }}{% endif %}
+                {% if suggestion.year %} — {{ suggestion.year }}{% endif %}
+                — <span class="c-badge c-badge--{% if suggestion.status == 'approved' %}success{% elif suggestion.status == 'rejected' %}danger{% else %}warning{% endif %}">{{ suggestion.get_status_display }}</span>
+              </p>
+              {% if suggestion.admin_note %}
+              <p class="profile__item-note"><strong>ملاحظة المشرف:</strong> {{ suggestion.admin_note }}</p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="profile__empty">لا توجد اقتراحات تعديل بعد.</p>
+      {% endif %}
+
+    {% else %}
+      {% if name_records %}
+        <ul class="profile__list">
+          {% for record in name_records %}
+            <li class="profile__item">
+              <span class="profile__item-title">{{ record.name }}</span>
+              <p class="profile__item-meta">
+                {{ record.get_kind_display }}
+                — <span class="c-badge c-badge--{% if record.status == 'approved' %}success{% elif record.status == 'rejected' %}danger{% else %}warning{% endif %}">{{ record.get_status_display }}</span>
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="profile__empty">لا توجد أسماء مقترحة بعد.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+</article>
+{% endblock %}

@@ -1,0 +1,38 @@
+<div class="category-chips category-chips--book">
+    {% for category in book.categories.all %}
+        <a href="{{ category.get_absolute_url }}" class="category-chip category-chip--verified">
+            {{ category.name }}
+        </a>
+    {% endfor %}
+
+    {% for suggestion in category_suggestions %}
+        <span class="category-chip category-chip--unverified">
+            <span class="category-chip__label">
+                {{ suggestion.final_category.name }}
+                {% include "components/core/icon.html" with name="help-circle" size=14 %}
+            </span>
+            {% include "encyclopedia/partials/category_suggestion_vote_buttons.html" with suggestion=suggestion %}
+        </span>
+    {% endfor %}
+
+    {% if request.user.is_authenticated %}
+        <button
+            type="button"
+            class="category-chip category-chip--add"
+            hx-get="{% url 'suggest_category' book.slug %}"
+            hx-target="#category-suggestion-form"
+            hx-swap="innerHTML"
+            aria-label="أضف تصنيفاً"
+        >
+            {% include "components/core/icon.html" with name="plus" size=16 %}
+        </button>
+    {% else %}
+        <a
+            class="category-chip category-chip--add"
+            href="{% url 'login' %}?next={{ request.path|urlencode }}"
+            aria-label="أضف تصنيفاً"
+        >
+            {% include "components/core/icon.html" with name="plus" size=16 %}
+        </a>
+    {% endif %}
+</div>

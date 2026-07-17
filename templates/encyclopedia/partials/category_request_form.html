@@ -1,0 +1,13 @@
+<form
+    class="category-request-form"
+    hx-post="{% url 'request_category' %}"
+    hx-target="this"
+    hx-swap="outerHTML"
+>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+        {% include "components/core/alert.html" with message=error type="error" %}
+    {% endfor %}
+    {% include "components/core/form_field.html" with field=form.name %}
+    <button type="submit" class="c-button c-button--primary c-button--sm">إرسال الطلب</button>
+</form>

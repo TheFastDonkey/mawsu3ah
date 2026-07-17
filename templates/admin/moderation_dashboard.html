@@ -1,0 +1,76 @@
+{% extends "admin/base_site.html" %}
+{% load i18n encyclopedia_extras %}
+
+{% block title %}طلبات المراجعة المعلقة | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>لوحة المراجعة</h1>
+
+  <div class="module moderation-filter-module">
+    <h2>تصفية حسب النوع</h2>
+    <p class="admin-filter-list">
+      <a href="{% url 'admin:moderation_dashboard' %}" class="admin-filter-link{% if type_filter == 'all' %} admin-filter-link--active{% endif %}">
+        الكل ({{ total_count }})
+      </a>
+      {% for key, label in type_labels.items %}
+      <a href="?type={{ key }}" class="admin-filter-link{% if type_filter == key %} admin-filter-link--active{% endif %}">
+        {{ label }} ({{ counts|get_item:key }})
+      </a>
+      {% endfor %}
+    </p>
+  </div>
+
+  {% if page_obj.object_list %}
+    <p class="admin-meta">{{ count }} طلب في الانتظار</p>
+
+    {% for item in page_obj.object_list %}
+    <div class="module moderation-item" data-type="{{ item.type }}">
+      <h2 class="moderation-item__title">
+        <span class="moderation-item__type">{{ item.type_label }}</span>
+        <a href="{{ item.detail_url }}">{{ item.title }}</a>
+      </h2>
+
+      {% if item.description %}
+      <p class="moderation-item__description">{{ item.description }}</p>
+      {% endif %}
+
+      <p class="moderation-item__meta">
+        مقدّم من {% user_name item.submitter %}
+        {% if item.timestamp %}· {{ item.timestamp|date:"Y/m/d H:i" }}{% endif %}
+      </p>
+
+      {% if item.extra.duplicates %}
+      <div class="moderation-item__warning">
+        <strong>تنبيه:</strong> قد تكون هذه الطبعة مكررة:
+        <ul>
+          {% for dup in item.extra.duplicates %}
+          <li><a href="{% url 'edition_detail' dup.book.slug dup.pk %}">{{ dup.publishers.all|join:"، " }} {% if dup.year %}({{ dup.year }}){% endif %}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="moderation-item__actions">
+        <form action="{% url 'admin:approve_item' item.type item.pk %}" method="post" class="inline-form">
+          {% csrf_token %}
+          <button type="submit" class="default">اعتمد</button>
+        </form>
+        <form action="{% url 'admin:reject_item' item.type item.pk %}" method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="text" name="rejection_reason" placeholder="سبب الرفض (اختياري)">
+          <button type="submit" class="deletelink">ارفض</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% include "encyclopedia/partials/pagination.html" with page_obj=page_obj %}
+  {% else %}
+    <div class="module moderation-empty">
+      <h2 class="moderation-empty__title">لا توجد طلبات مراجعة</h2>
+      <p class="moderation-empty__text">كل الطلبات المعروضة تم معالجتها.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

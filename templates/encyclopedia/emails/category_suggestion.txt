@@ -1,0 +1,8 @@
+اقتراح تصنيف لكتاب
+
+الكتاب: {{ book.title }} — {{ book.author }}
+المستخدم: {{ user.get_full_name|default:user.email }} ({{ user.email }})
+التصنيف المقترح: {{ suggestion.name }}
+
+راجع الاقتراح في لوحة الإدارة:
+{{ url }}

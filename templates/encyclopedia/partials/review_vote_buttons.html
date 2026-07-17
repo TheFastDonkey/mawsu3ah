@@ -1,0 +1,29 @@
+<span id="review-vote-buttons-{{ review.public_id }}" class="vote-group vote-group--small">
+    <button
+        type="button"
+        class="vote-button vote-button--small vote-button--like{% if user_vote == 1 %} is-active{% endif %}"
+        hx-post="{% url 'review_vote' review.public_id %}"
+        hx-vals='{"vote": "like"}'
+        hx-target="#review-vote-buttons-{{ review.public_id }}"
+        hx-swap="outerHTML"
+        hx-disabled-elt=".vote-button"
+        aria-label="إعجاب"
+        aria-pressed="{% if user_vote == 1 %}true{% else %}false{% endif %}"
+    >
+        {% include "components/core/icon.html" with name="thumbs-up" size=14 %}
+    </button>
+    <span class="vote-score vote-score--small" aria-label="التقييم">{{ review.vote_score }}</span>
+    <button
+        type="button"
+        class="vote-button vote-button--small vote-button--dislike{% if user_vote == -1 %} is-active{% endif %}"
+        hx-post="{% url 'review_vote' review.public_id %}"
+        hx-vals='{"vote": "dislike"}'
+        hx-target="#review-vote-buttons-{{ review.public_id }}"
+        hx-swap="outerHTML"
+        hx-disabled-elt=".vote-button"
+        aria-label="عدم إعجاب"
+        aria-pressed="{% if user_vote == -1 %}true{% else %}false{% endif %}"
+    >
+        {% include "components/core/icon.html" with name="thumbs-down" size=14 %}
+    </button>
+</span>

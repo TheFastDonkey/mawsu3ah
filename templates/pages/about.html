@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}من نحن | الموسوعة الكبرى لأفضل طبعات الكتب{% endblock %}
+{% block meta_description %}موسوعة مجتمعية تهدف إلى توثيق أفضل الطبعات الورقية للكتب العربية، بإشراف خبراء ومراجعة دقيقة.{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>من نحن</h1>
+    <p class="page-subtitle">موسوعة مجتمعية تهدف إلى توثيق أفضل الطبعات الورقية للكتب العربية.</p>
+</header>
+
+<div class="content-stack">
+    <section class="c-card content-card">
+        <h2 class="content-card__title">رسالتنا</h2>
+        <p>
+            بين مئات الطبعات التي تخرج كل عام للكتاب الواحد، يصعب على القارئ معرفة أيها الأكثر موثوقيةً بالنصّ والتحقيق.
+            الموسوعة الكبرى تجمع بين خبرة المحققين وملاحظات القرّاء، لتقدّم دليلاً مقارناً واضحاً للطبعات الورقية العربية.
+        </p>
+        <p>
+            نؤمن بأنّ الكتاب الورقي يظلّ مرجعاً ثابتاً، وأنّ اختيار طبعته لا ينبغي أن يكون محضَ صدفة أو تسويق.
+        </p>
+    </section>
+
+    <section class="c-card content-card">
+        <h2 class="content-card__title">كيف تعمل الموسوعة</h2>
+        <ul class="content-list">
+            <li>
+                <strong>المحتوى من المجتمع:</strong> يساهم الأعضاء بطبعاتهم مع بيانات النشر والتحقيق والملاحظات.
+            </li>
+            <li>
+                <strong>مراجعة إدارية:</strong> تفحص الطلبات قبل النشر للتأكد من دقة البيانات وملاءمة المحتوى.
+            </li>
+            <li>
+                <strong>تصويت مقارن:</strong> يصوّت القرّاء والخبراء للطبعات الأكثر موثوقيةً، فتبرز الأفضل دون ضجيج.
+            </li>
+            <li>
+                <strong>علامة الخبير:</strong> تُمنح للمساهمين الموثوقين بعد مراجعة الإدارة، لتكون مرجعاً للقارئ.
+            </li>
+        </ul>
+    </section>
+
+    <section class="c-card content-card">
+        <h2 class="content-card__title">مبادئنا</h2>
+        <ul class="content-list content-list--two-col">
+            <li>الدقة قبل السرعة</li>
+            <li>الشفافية في المراجعة</li>
+            <li>احترام الملكية الفكرية</li>
+            <li>سهولة الاستخدام على كل الأجهزة</li>
+        </ul>
+    </section>
+
+    <section class="c-card content-card content-card--cta">
+        <h2 class="content-card__title">انضمّ إلى المشروع</h2>
+        <p>
+            لديك طبعة موثوقة أو ملاحظة تصحيحية؟ ساهم في بناء هذا الدليل وساعد القرّاء على اختيار الأفضل.
+        </p>
+        <div class="content-actions">
+            <a href="{% url 'submit_edition' %}" class="c-button c-button--primary c-button--md">ترشيح طبعة</a>
+            <a href="{% url 'contact' %}" class="c-button c-button--secondary c-button--md">تواصل معنا</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

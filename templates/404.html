@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}الصفحة غير موجودة — الموسوعة الكبرى{% endblock %}
+
+{% block content %}
+<div class="c-empty-state">
+    <h1 class="c-empty-state__title">٤٠٤</h1>
+    <p class="c-empty-state__text">{{ message|default:"لم نجد الصفحة التي تبحث عنها." }}</p>
+    <a href="{% url 'home' %}" class="c-button c-button--primary">العودة إلى الرئيسية</a>
+</div>
+{% endblock %}

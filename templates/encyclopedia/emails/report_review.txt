@@ -1,0 +1,8 @@
+بلاغ جديد عن مراجعة
+
+المراجعة: #{{ review.pk }}
+المُبلّغ: {{ reporter }}
+السبب: {{ report.get_reason_display }}
+{% if report.details %}تفاصيل: {{ report.details }}{% endif %}
+
+رابط المراجعة: {{ url }}

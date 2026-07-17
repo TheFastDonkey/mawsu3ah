@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}تأكيد تقديم طبعة{% endblock %}
+
+{% block content %}
+<h1>تنبيه: طبعات مشابهة موجودة</h1>
+<p>وجدنا طبعات معتمدة قد تكون مطابقة لما تريد إضافته. يرجى التحقق قبل المتابعة.</p>
+
+<ul class="duplicate-list">
+    {% for edition in duplicates %}
+    <li>
+        <strong>{{ edition.book.title }}</strong> — {{ edition.publishers.all|join:"، " }}
+        {% if edition.year %}({{ edition.year }}){% endif %}
+        {% if edition.volumes %}— المجلدات: {{ edition.volumes }}{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+<form method="post" action="{% url 'submit_edition' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+        {% if field.name == 'cover_image' %}
+            {% if temp_cover_image %}
+                <input type="hidden" name="temp_cover_image" value="{{ temp_cover_image }}">
+                <p class="c-alert c-alert--success">تم حفظ صورة الغلاف مؤقتاً. إذا اخترت صورة جديدة أدناه، ستُستخدم الجديدة.</p>
+            {% endif %}
+            {% include "components/core/form_field.html" with field=field %}
+        {% else %}
+            {{ field.as_hidden }}
+        {% endif %}
+    {% endfor %}
+    <input type="hidden" name="confirm_override" value="1">
+    <button type="submit">ما زلت أريد التقديم</button>
+    <a href="{% url 'submit_edition' %}" class="button secondary">رجوع للتعديل</a>
+</form>
+{% endblock %}

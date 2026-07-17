@@ -1,0 +1,19 @@
+{% comment %}
+  Avatar component.
+
+  Props:
+    user — the user to render. Falls back to a generic placeholder if None.
+    size — "sm" | "md" | "lg" (default "md").
+{% endcomment %}
+{% load encyclopedia_extras %}
+{% with first_initial=user.username|first %}
+<span class="avatar avatar--{{ size }}">
+  {% if user and user.profile.avatar %}
+    <img src="{{ user.profile.avatar.url }}" alt="صورة {{ user.username }}" loading="lazy">
+  {% elif user %}
+    <span class="avatar__initials" aria-hidden="true">{{ first_initial }}</span>
+  {% else %}
+    <span class="avatar__initials" aria-hidden="true">?</span>
+  {% endif %}
+</span>
+{% endwith %}

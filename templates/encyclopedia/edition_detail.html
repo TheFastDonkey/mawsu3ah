@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% load encyclopedia_extras %}
+
+{% block title %}{{ edition.book.title }} — طبعة {{ edition.publishers.all|join:"، " }}{% endblock %}
+
+{% block meta_description %}طبعة {{ edition.publishers.all|join:"، " }}{% if edition.year %} ({{ edition.year }}){% endif %} لكتاب {{ edition.book.title }} في الموسوعة الكبرى.{% endblock %}
+{% block og_title %}{{ edition.book.title }} — طبعة {{ edition.publishers.all|join:"، " }}{% endblock %}
+{% block og_description %}تفاصيل وإعجابات ومراجعات على طبعة {{ edition.publishers.all|join:"، " }} لكتاب {{ edition.book.title }}.{% endblock %}
+{% block canonical_url %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'edition_detail' edition.book.slug edition.public_id %}">{% endblock %}
+{% block extra_head %}{% if edition.cover_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ edition.cover_image.url }}">{% endif %}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb" aria-label="مسار التنقل">
+    {% with primary=edition.book.primary_category %}
+    {% if primary %}
+    <a href="{{ primary.get_absolute_url }}">{{ primary.name }}</a>
+    <span aria-hidden="true">/</span>
+    {% endif %}
+    {% endwith %}
+    <a href="{% url 'book_detail' edition.book.slug %}">{{ edition.book.title }}</a>
+    <span aria-hidden="true">/</span>
+    <span>طبعة {{ edition.publishers.all|join:"، " }}</span>
+</nav>
+
+<article class="edition-detail">
+    <header class="edition-detail__header">
+        <div class="edition-detail__text">
+            <p class="edition-detail__kicker">طبعة معتمدة</p>
+            <h1>{{ edition.book.title }}</h1>
+            <p class="edition-detail__author">{% name_links edition.book.authors.all "author" %}</p>
+            {% if edition.editors.all %}
+            <p class="edition-detail__editor">
+                تحقيق {% name_links edition.editors.all "editor" %}
+            </p>
+            {% endif %}
+            <div class="edition-detail__actions">
+                <div class="vote-group-wrapper">
+                    {% include "encyclopedia/partials/edition_vote_buttons.html" %}
+                    <button
+                        type="button"
+                        class="vote-viewer"
+                        data-votes-url="{% url 'edition_votes' edition.book.slug edition.public_id %}"
+                        data-container-id="edition-votes-container-{{ edition.public_id }}"
+                        aria-label="عرض من صوّت على هذه الطبعة"
+                    >
+                        {% include "components/core/icon.html" with name="users" size=16 %}
+                    </button>
+                </div>
+                <div id="edition-votes-container-{{ edition.public_id }}" class="edition-votes-container"></div>
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'suggest_edition_edit' edition.book.slug edition.public_id %}" class="edition-detail__edit-link">اقترح تعديلاً</a>
+                {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="edition-detail__edit-link">اقترح تعديلاً</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if edition.cover_image %}
+        <figure class="edition-detail__cover">
+            <img src="{{ edition.cover_image.url }}" alt="غلاف طبعة {{ edition.publishers.all|join:"، " }} لكتاب {{ edition.book.title }}" loading="lazy">
+        </figure>
+        {% endif %}
+    </header>
+
+    {% if category_suggestions or edition.book.categories.all %}
+    <section class="edition-detail__categories" aria-label="التصنيفات">
+        <h2 class="edition-detail__categories-title">التصنيفات</h2>
+        <div id="book-categories-kicker">
+            {% include "encyclopedia/partials/book_categories_kicker.html" with book=edition.book %}
+        </div>
+        <div id="category-suggestion-form"></div>
+        <div
+            aria-hidden="true"
+            hx-get="{% url 'book_categories_kicker' edition.book.slug %}"
+            hx-trigger="refreshCategoryKicker from:body"
+            hx-target="#book-categories-kicker"
+            hx-swap="innerHTML"
+        ></div>
+    </section>
+    {% endif %}
+
+    <dl class="edition-detail__facts">
+        <div class="edition-detail__fact">
+            <dt class="edition-detail__fact-label">الناشرون</dt>
+            <dd class="edition-detail__fact-value">
+                {% name_links edition.publishers.all "publisher" %}{% if edition.year %} · {{ edition.year }}{% endif %}
+            </dd>
+        </div>
+        {% if edition.editors.all %}
+        <div class="edition-detail__fact">
+            <dt class="edition-detail__fact-label">المحققون</dt>
+            <dd class="edition-detail__fact-value">{% name_links edition.editors.all "editor" %}</dd>
+        </div>
+        {% endif %}
+        {% if edition.volumes %}
+        <div class="edition-detail__fact">
+            <dt class="edition-detail__fact-label">المجلدات</dt>
+            <dd class="edition-detail__fact-value">{{ edition.volumes }}</dd>
+        </div>
+        {% endif %}
+        {% if edition.page_count %}
+        <div class="edition-detail__fact">
+            <dt class="edition-detail__fact-label">الصفحات</dt>
+            <dd class="edition-detail__fact-value">{{ edition.page_count }}</dd>
+        </div>
+        {% endif %}
+        {% with edition.city_display as displayed_city %}
+        {% if displayed_city %}
+        <div class="edition-detail__fact">
+            <dt class="edition-detail__fact-label">مدينة النشر</dt>
+            <dd class="edition-detail__fact-value">{{ displayed_city }}</dd>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </dl>
+
+    <div class="edition-detail__provenance">
+        <span class="edition-detail__provenance-meta">
+            مقدمة من {% user_name edition.submitted_by %}
+            · {{ edition.submitted_at|date:"Y/m/d" }}
+            {% if edition.liked_by_expert %}
+            <span class="edition-detail__expert-badge">
+                {% include "components/core/icon.html" with name="award" size=14 %}
+                أعجب بها خبير
+            </span>
+            {% endif %}
+        </span>
+    </div>
+
+    {% with relation=edition.related_sources.first %}
+    {% if relation %}
+    <div class="edition-detail__relation-notice">
+        {% if relation.kind == "photocopy" %}
+        <p>هذه <strong>طبعة مصورة</strong> عن <a href="{{ relation.source.get_absolute_url }}">{{ relation.source }}</a>.</p>
+        {% elif relation.kind == "reprint" %}
+        <p>هذه <strong>إعادة طبع</strong> عن <a href="{{ relation.source.get_absolute_url }}">{{ relation.source }}</a>.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% if edition.related_targets.exists %}
+    <section class="edition-detail__relations">
+        <h2 class="edition-detail__relations-title">طبعات مرتبطة</h2>
+        {% regroup edition.related_targets.all by kind as relation_groups %}
+        {% for group in relation_groups %}
+        <div class="edition-detail__relation-group">
+            <h3 class="edition-detail__relation-kind">
+                {% if group.grouper == "photocopy" %}طبعات مصورة{% elif group.grouper == "reprint" %}إعادات طبع{% endif %}
+            </h3>
+            <ul class="edition-detail__relation-list">
+                {% for relation in group.list %}
+                <li>
+                    <a href="{{ relation.target.get_absolute_url }}">
+                        {{ relation.target.publishers.all|join:"، " }}
+                        {% if relation.target.year %}· {{ relation.target.year }}{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <div class="edition-detail__suggest-relation">
+        {% if request.user.is_authenticated %}
+        <a class="c-button c-button--secondary c-button--sm" href="{% url 'suggest_edition_relation' edition.book.slug edition.public_id %}">اقترح طبعة مصورة أو إعادة طبع</a>
+        {% else %}
+        <a class="c-button c-button--secondary c-button--sm" href="{% url 'login' %}?next={{ request.path }}">اقترح طبعة مصورة أو إعادة طبع</a>
+        {% endif %}
+    </div>
+</article>
+
+{% include "encyclopedia/partials/comment_list.html" %}
+{% endblock %}

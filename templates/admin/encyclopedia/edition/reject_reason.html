@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n %}
+
+{% block content %}
+<div id="content-main">
+    <p>سيتم رفض الطبعات التالية وتسجيلها في سجل الاعتماد:</p>
+
+    <ul>
+        {% for edition in editions %}
+        <li>{{ edition }}</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for edition in editions %}
+        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ edition.pk|unlocalize }}">
+        {% endfor %}
+
+        <input type="hidden" name="action" value="reject_editions">
+        <input type="hidden" name="post" value="yes">
+
+        <div class="form-row">
+            <label for="rejection_reason">سبب الرفض (اختياري):</label>
+            <textarea name="rejection_reason" id="rejection_reason" rows="4"></textarea>
+        </div>
+
+        <div class="submit-row">
+            <button type="submit" name="confirm_reject" class="button default">تأكيد الرفض</button>
+            <a href="{% url "admin:encyclopedia_edition_changelist" %}" class="button">إلغاء</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

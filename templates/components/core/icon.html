@@ -1,0 +1,9 @@
+{% comment %}
+  Icon component — renders a Lucide icon.
+
+  Props:
+    name  (required) — Lucide icon name, e.g. "moon", "search", "book-open".
+    class — extra CSS classes.
+    size  — optional size in pixels (default 24).
+{% endcomment %}
+<i data-lucide="{{ name }}" class="c-icon{% if size %} c-icon--{{ size }}{% endif %}{% if class %} {{ class }}{% endif %}"></i>

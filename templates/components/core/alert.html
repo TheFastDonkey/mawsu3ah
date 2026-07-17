@@ -1,0 +1,11 @@
+{% comment %}
+  Alert / message component.
+
+  Props:
+    message (required) — alert text.
+    type    — info | success | warning | error (default: info).
+    class   — extra CSS classes.
+{% endcomment %}
+<div class="c-alert c-alert--{{ type|default:"info" }}{% if class %} {{ class }}{% endif %}" role="alert">
+  {{ message }}
+</div>

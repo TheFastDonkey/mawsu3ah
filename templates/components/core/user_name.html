@@ -1,0 +1,16 @@
+{% comment %}
+  User name component.
+
+  Props:
+    user — the user to render. Falls back to "مستخدم محذوف" if None.
+{% endcomment %}
+{% if user and user.pk %}
+  <a href="{% url 'public_profile' user.username %}" class="user-name">
+    {{ user.username|default:"مستخدم" }}
+    {% if user.is_expert %}
+      {% include "components/core/badge.html" with label=user.expert_label variant="expert" class="user-name__badge" %}
+    {% endif %}
+  </a>
+{% else %}
+  <span class="user-name">مستخدم محذوف</span>
+{% endif %}
