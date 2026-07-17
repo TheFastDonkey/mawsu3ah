@@ -35,9 +35,6 @@ COPY . .
 # Default production settings; override via DJANGO_SETTINGS_MODULE if desired.
 ENV DJANGO_SETTINGS_MODULE=mawsu3ah.settings.prod
 
-# Collect static files into the image.
-RUN python manage.py collectstatic --noinput
-
 EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
