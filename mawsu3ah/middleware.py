@@ -54,7 +54,7 @@ class TrustedProxyMiddleware:
         trusted_proxies = getattr(settings, "TRUSTED_PROXY_IPS", [])
         if trust_proto and trusted_proxies:
             remote_addr = request.META.get("REMOTE_ADDR")
-            if remote_addr in trusted_proxies:
+            if self._is_trusted_proxy(remote_addr, trusted_proxies):
                 forwarded_proto = request.META.get("HTTP_X_FORWARDED_PROTO", "").lower()
                 if forwarded_proto == "https":
                     request.META["HTTPS"] = "on"
@@ -63,6 +63,25 @@ class TrustedProxyMiddleware:
                     request.META["HTTPS"] = "off"
                     request.META["wsgi.url_scheme"] = "http"
         return self.get_response(request)
+
+    @staticmethod
+    def _is_trusted_proxy(remote_addr, trusted_proxies):
+        if remote_addr is None:
+            return False
+        try:
+            remote_ip = ipaddress.ip_address(remote_addr)
+        except ValueError:
+            return False
+        for proxy in trusted_proxies:
+            try:
+                if "/" in proxy:
+                    if remote_ip in ipaddress.ip_network(proxy, strict=False):
+                        return True
+                elif remote_ip == ipaddress.ip_address(proxy):
+                    return True
+            except ValueError:
+                continue
+        return False
 
 
 class AdminSecurityMiddleware:
