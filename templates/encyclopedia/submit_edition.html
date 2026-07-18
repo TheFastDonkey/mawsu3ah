@@ -5,7 +5,7 @@
 {% block content %}
 <h1>تقديم طبعة جديدة</h1>
 <p>كل طلب يمر بالمراجعة قبل الظهور للزوار.</p>
-<p class="form-note">الأسماء الجديدة (مؤلف/محقق/ناشر) تُرسل تلقائيًا للمراجعة عند تقديم الطبعة.</p>
+<p class="form-note">الأسماء الجديدة (من مؤلف ومحقق وناشر) تُرسل تلقائيًا للمراجعة عند تقديم الطبعة.</p>
 
 <form method="post" action="{% url 'submit_edition' %}" enctype="multipart/form-data">
     {% csrf_token %}
@@ -50,8 +50,8 @@
                     </div>
                     <div id="id_existing_book-suggestions" class="autocomplete-results"></div>
                     <div id="id_existing_book-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                        {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                        <span>جارٍ البحث...</span>
+                        {% include "components/core/spinner.html" with label="انتظر..." %}
+                        <span>انتظر...</span>
                     </div>
                     {% if form.existing_book.errors %}
                         <ul class="c-form-field__errors">
@@ -81,8 +81,8 @@
                         </ul>
                     {% endif %}
                     <div id="id_new_book_author-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                        {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                        <span>جارٍ البحث...</span>
+                        {% include "components/core/spinner.html" with label="انتظر..." %}
+                        <span>انتظر...</span>
                     </div>
                 </div>
                 <div class="c-form-field">
@@ -106,8 +106,8 @@
                         </div>
                         <div id="id_new_book_category_suggestions" class="autocomplete-results"></div>
                         <div id="id_new_book_category_indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                            {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                            <span>جارٍ البحث...</span>
+                            {% include "components/core/spinner.html" with label="انتظر..." %}
+                            <span>انتظر...</span>
                         </div>
                     </div>
                     {{ form.new_book_categories }}
@@ -141,8 +141,8 @@
                 </ul>
             {% endif %}
             <div id="id_publisher-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                <span>جارٍ البحث...</span>
+                {% include "components/core/spinner.html" with label="انتظر..." %}
+                <span>انتظر...</span>
             </div>
         </div>
         <div class="field-row">
@@ -171,8 +171,8 @@
                 </ul>
             {% endif %}
             <div id="id_editor-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                <span>جارٍ البحث...</span>
+                {% include "components/core/spinner.html" with label="انتظر..." %}
+                <span>انتظر...</span>
             </div>
         </div>
         {% include "components/core/form_field.html" with field=form.cover_image %}

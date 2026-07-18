@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>اقتراح طبعة مصورة أو إعادة طبع</h1>
-<p class="form-note">كل اقتراح يمر بالمراجعة قبل اعتماده.</p>
+<p class="form-note">كل اقتراح يٌراجغ قبل اعتماده.</p>
 
 <div class="edit-target-card">
     <p><strong>{{ source.book.title }}</strong></p>
@@ -46,7 +46,7 @@
                     hx-target="#id_target-suggestions"
                     hx-indicator="#id_target-indicator"
                 >
-                <span id="id_target-indicator" class="htmx-indicator">جارٍ البحث…</span>
+                <span id="id_target-indicator" class="htmx-indicator">انتظر…</span>
                 <div id="id_target-suggestions" class="suggestions-dropdown"></div>
                 {% for error in form.target.errors %}
                     {% include "components/core/alert.html" with message=error type="error" %}
@@ -71,8 +71,8 @@
                     </ul>
                 {% endif %}
                 <div id="id_publisher-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                    {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                    <span>جارٍ البحث...</span>
+                    {% include "components/core/spinner.html" with label="انتظر..." %}
+                    <span>انتظر...</span>
                 </div>
             </div>
 
@@ -91,8 +91,8 @@
                     </ul>
                 {% endif %}
                 <div id="id_editor-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                    {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                    <span>جارٍ البحث...</span>
+                    {% include "components/core/spinner.html" with label="انتظر..." %}
+                    <span>انتظر...</span>
                 </div>
             </div>
 

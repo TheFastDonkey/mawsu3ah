@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>اقتراح تعديل على طبعة</h1>
-<p class="form-note">كل تعديل يمر بالمراجعة قبل اعتماده.</p>
+<p class="form-note">كل تعديل يٌراجع قبل اعتماده.</p>
 
 <div class="edit-target-card">
     <p><strong>{{ edition.book.title }}</strong></p>
@@ -36,8 +36,8 @@
                 </ul>
             {% endif %}
             <div id="id_publisher-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                <span>جارٍ البحث...</span>
+                {% include "components/core/spinner.html" with label="انتظر..." %}
+                <span>انتظر...</span>
             </div>
         </div>
 
@@ -65,8 +65,8 @@
                 </ul>
             {% endif %}
             <div id="id_editor-indicator" class="autocomplete-loading htmx-indicator" aria-live="polite">
-                {% include "components/core/spinner.html" with label="جارٍ البحث..." %}
-                <span>جارٍ البحث...</span>
+                {% include "components/core/spinner.html" with label="انتظر..." %}
+                <span>انتظر...</span>
             </div>
         </div>
 

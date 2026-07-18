@@ -52,9 +52,9 @@ class CategoryAdminForm(forms.ModelForm):
         parent = self.cleaned_data.get("parent")
         if parent and self.instance.pk:
             if parent.pk == self.instance.pk:
-                raise forms.ValidationError("لا يمكن أن يكون التصنيف أباً لنفسه.")
+                raise forms.ValidationError("لا يكون التصنيف أصلًا لنفسه.")
             if Category.objects.filter(pk=parent.pk, path__startswith=self.instance.path).exists():
-                raise forms.ValidationError("لا يمكن نقل تصنيف إلى أحد أحفاده.")
+                raise forms.ValidationError("لا يٌنقل تصنيف إلى فرع فرعه.")
         return parent
 
 
@@ -103,7 +103,7 @@ class CategorySuggestionAdmin(admin.ModelAdmin):
             count += 1
         self.message_user(
             request,
-            f"تم اعتماد {count} اقتراح تصنيف.",
+            f"اعتمدنا {count} اقتراح تصنيف.",
             messages.SUCCESS,
         )
 
@@ -116,7 +116,7 @@ class CategorySuggestionAdmin(admin.ModelAdmin):
         )
         self.message_user(
             request,
-            f"تم رفض {count} اقتراح تصنيف.",
+            f"رفضنا {count} اقتراح تصنيف.",
             messages.SUCCESS,
         )
 
@@ -144,7 +144,7 @@ class CategoryRequestAdmin(admin.ModelAdmin):
             count += 1
         self.message_user(
             request,
-            f"تم اعتماد {count} طلب تصنيف.",
+            f"اعتمدنا {count} طلب تصنيف.",
             messages.SUCCESS,
         )
 
@@ -157,7 +157,7 @@ class CategoryRequestAdmin(admin.ModelAdmin):
         )
         self.message_user(
             request,
-            f"تم رفض {count} طلب تصنيف.",
+            f"رفضنا {count} طلب تصنيف.",
             messages.SUCCESS,
         )
 
@@ -176,7 +176,7 @@ class BookAdminForm(forms.ModelForm):
     primary_category = forms.ModelChoiceField(
         queryset=Category.objects.order_by("path"),
         required=True,
-        label="التصنيف الرئيسي",
+        label="التصنيف الأصلي",
     )
 
     class Meta:
@@ -202,7 +202,7 @@ class BookAdminForm(forms.ModelForm):
         if primary and primary.pk not in {c.pk for c in selected}:
             self.add_error(
                 "primary_category",
-                "يجب أن يكون التصنيف الرئيسي أحد التصنيفات المختارة.",
+                "لا بد أن يكون التصنيف الأصلي أحد التصنيفات المختارة.",
             )
         return cleaned
 
@@ -287,8 +287,8 @@ class HasPendingReportsFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [
-            ("yes", "يوجد بلاغات معلقة"),
-            ("no", "لا توجد بلاغات معلقة"),
+            ("yes", "توجد بلاغات معلقة"),
+            ("no", "لا بلاغات معلقة"),
         ]
 
     def queryset(self, request, queryset):
@@ -316,7 +316,7 @@ class ReviewAdmin(admin.ModelAdmin):
             count,
             list(queryset.values_list("pk", flat=True)),
         )
-        self.message_user(request, "تم إخفاء المراجعات المحددة.")
+        self.message_user(request, "أخفيت المراجعات المحددة.")
 
     @admin.action(description="إظهار المراجعات المحددة")
     def show_reviews(self, request, queryset):
@@ -327,7 +327,7 @@ class ReviewAdmin(admin.ModelAdmin):
             count,
             list(queryset.values_list("pk", flat=True)),
         )
-        self.message_user(request, "تم إظهار المراجعات المحددة.")
+        self.message_user(request, "أظهرت المراجعات المحددة.")
 
 
 @admin.register(ReviewVote)
@@ -484,7 +484,7 @@ class EditionAdmin(admin.ModelAdmin):
             count,
             edition_ids,
         )
-        self.message_user(request, f"تم اعتماد {count} طبعة.", messages.SUCCESS)
+        self.message_user(request, f"اعتمدنا {count} طبعة.", messages.SUCCESS)
 
     @admin.action(description="ارفض الطبعات المحددة")
     def reject_editions(self, request, queryset):
@@ -513,7 +513,7 @@ class EditionAdmin(admin.ModelAdmin):
                 edition_ids,
                 reason,
             )
-            self.message_user(request, f"تم رفض {count} طبعة.", messages.SUCCESS)
+            self.message_user(request, f"رفضنا {count} طبعة.", messages.SUCCESS)
             return HttpResponseRedirect(request.get_full_path())
 
         context = {
@@ -570,7 +570,7 @@ class NameRecordAdmin(admin.ModelAdmin):
             count,
             list(queryset.values_list("pk", flat=True)),
         )
-        self.message_user(request, f"تم اعتماد {count} اسم.", messages.SUCCESS)
+        self.message_user(request, f"اعتمدنا {count} اسم.", messages.SUCCESS)
 
     @admin.action(description="ارفض الأسماء المحددة")
     def reject_records(self, request, queryset):
@@ -581,7 +581,7 @@ class NameRecordAdmin(admin.ModelAdmin):
             count,
             list(queryset.values_list("pk", flat=True)),
         )
-        self.message_user(request, f"تم رفض {count} اسم.", messages.SUCCESS)
+        self.message_user(request, f"رفضنا {count} اسم.", messages.SUCCESS)
 
 
 @admin.register(Author)
@@ -607,13 +607,13 @@ class EditionEditSuggestionAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at", "resolved_at"]
     actions = ["approve_suggestions", "reject_suggestions"]
 
-    @admin.action(description="اعتمد الاقتراحات المحددة وطبّق التعديلات")
+    @admin.action(description="اعتمد الاقتراحات وطبّق التعديلات")
     def approve_suggestions(self, request, queryset):
         count = 0
         for suggestion in queryset.filter(status="pending"):
             suggestion.apply_to_edition(request.user)
             count += 1
-        self.message_user(request, f"تم اعتماد {count} اقتراح تعديل.", messages.SUCCESS)
+        self.message_user(request, f"اعتمدنا {count} اقتراح تعديل.", messages.SUCCESS)
 
     @admin.action(description="ارفض الاقتراحات المحددة")
     def reject_suggestions(self, request, queryset):
@@ -623,7 +623,7 @@ class EditionEditSuggestionAdmin(admin.ModelAdmin):
             resolved_by=request.user,
             resolved_at=now,
         )
-        self.message_user(request, f"تم رفض {count} اقتراح تعديل.", messages.SUCCESS)
+        self.message_user(request, f"رفضنا {count} اقتراح تعديل.", messages.SUCCESS)
 
 
 @admin.register(EditionBookLinkSuggestion)
@@ -641,7 +641,7 @@ class EditionBookLinkSuggestionAdmin(admin.ModelAdmin):
             suggestion.approve(request.user)
             count += 1
         self.message_user(
-            request, f"تم اعتماد {count} اقتراح ربط.", messages.SUCCESS
+            request, f"اعتمدنا {count} اقتراح ربط.", messages.SUCCESS
         )
 
     @admin.action(description="ارفض الاقتراحات المحددة")
@@ -652,7 +652,7 @@ class EditionBookLinkSuggestionAdmin(admin.ModelAdmin):
             resolved_by=request.user,
             resolved_at=now,
         )
-        self.message_user(request, f"تم رفض {count} اقتراح ربط.", messages.SUCCESS)
+        self.message_user(request, f"رفضنا {count} اقتراح ربط.", messages.SUCCESS)
 
 
 @admin.register(EditionRelationSuggestion)
@@ -678,7 +678,7 @@ class EditionRelationSuggestionAdmin(admin.ModelAdmin):
             suggestion.approve(request.user)
             count += 1
         self.message_user(
-            request, f"تم اعتماد {count} اقتراح علاقة.", messages.SUCCESS
+            request, f"اعتمدنا {count} اقتراح علاقة.", messages.SUCCESS
         )
 
     @admin.action(description="ارفض الاقتراحات المحددة")
@@ -689,4 +689,4 @@ class EditionRelationSuggestionAdmin(admin.ModelAdmin):
             resolved_by=request.user,
             resolved_at=now,
         )
-        self.message_user(request, f"تم رفض {count} اقتراح علاقة.", messages.SUCCESS)
+        self.message_user(request, f"رفضنا {count} اقتراح علاقة.", messages.SUCCESS)

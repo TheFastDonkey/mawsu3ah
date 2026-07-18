@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}التصنيفات — الموسوعة الكبرى{% endblock %}
+{% block title %}التصنيفات - الموسوعة الكبرى{% endblock %}
 {% block meta_description %}تصفح تصنيفات الكتب في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% block content %}
 <section class="page-header">
     <h1>التصنيفات</h1>
-    <p class="page-subtitle">تصفح التصنيفات أو اقترح تصنيفاً جديداً.</p>
+    <p class="page-subtitle">تصفح التصنيفات أو اقترح تصنيفًا جديدًا.</p>
 </section>
 
 <section class="categories-section" id="suggest-category">
@@ -17,15 +17,15 @@
             hx-get="{% url 'request_category' %}"
             hx-target="#category-request-form"
             hx-swap="innerHTML"
-        >اقترح تصنيفاً</button>
+        >اقترح تصنيفًا</button>
         <div id="category-request-form"></div>
     {% else %}
         <a
             class="c-button c-button--secondary c-button--sm"
             href="{% url 'login' %}?next={{ request.path|urlencode }}#suggest-category"
-        >اقترح تصنيفاً</a>
+        >اقترح تصنيفًا</a>
         <p class="category-request__login-hint">
-            <a href="{% url 'login' %}?next={{ request.path|urlencode }}#suggest-category">سجّل الدخول</a> لإرسال اقتراح.
+            <a href="{% url 'login' %}?next={{ request.path|urlencode }}#suggest-category">سجّل الدخول</a> لتقترح.
         </p>
     {% endif %}
 </section>
@@ -49,7 +49,7 @@
         </ul>
     </nav>
     {% else %}
-    <p class="empty-state">لا توجد تصنيفات بعد.</p>
+    <p class="empty-state">لا تصنيفات.</p>
     {% endif %}
 </section>
 {% endblock %}

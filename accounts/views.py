@@ -46,7 +46,7 @@ def register(request):
                 logger.exception("Failed to send verification email to %s", user.email)
             messages.success(
                 request,
-                "تم إنشاء الحساب. تحقق من بريدك الإلكتروني لتفعيل الحساب.",
+                "أنشئ الحساب. تحقق من بريدك لتفعيله.",
             )
             return redirect("login")
         else:
@@ -63,7 +63,7 @@ def send_verification_email(request, user):
     url = request.build_absolute_uri(
         reverse("verify_email", kwargs={"uidb64": uid, "token": token})
     )
-    subject = "تفعيل حسابك في الموسوعة الكبرى لأفضل طبعات الكتب"
+    subject = "تفعيل حسابك في الموسوعة الكبرى"
     message = render_to_string(
         "accounts/emails/verify_email.txt",
         {"user": user, "url": url},
@@ -81,10 +81,10 @@ def verify_email(request, uidb64, token):
     if user is not None and email_verification_token.check_token(user, token):
         user.email_verified = True
         user.save()
-        messages.success(request, "تم تفعيل بريدك الإلكتروني بنجاح. يمكنك الآن تسجيل الدخول.")
+        messages.success(request, "فعلت بريدك، فالآن تستطيع الدخول.")
         return redirect("login")
 
-    messages.error(request, "رابط التفعيل غير صالح أو منتهي الصلاحية.")
+    messages.error(request, "رابط التفعيل خطأ أو منتهٍ.")
     return redirect("register")
 
 
@@ -116,7 +116,7 @@ def magic_link_request(request):
             _dummy_magic_link_work(email)
         messages.info(
             request,
-            "إذا كان البريد مسجلاً، فقد أرسلنا رابطاً للدخول.",
+            "إذا كان لك حساب بهذا البريد، فقد أرسلنا لك الرابط لتدخل منه.",
         )
         return redirect("magic_link_request")
 
@@ -135,7 +135,7 @@ def send_magic_link(request, user):
     url = request.build_absolute_uri(
         reverse("magic_link_verify", kwargs={"uidb64": uid, "token": token})
     )
-    subject = "رابط الدخول السريع إلى الموسوعة الكبرى لأفضل طبعات الكتب"
+    subject = "رابط الدخول السريع إلى الموسوعة الكبرى"
     message = render_to_string(
         "accounts/emails/magic_link.txt",
         {"user": user, "url": url},
@@ -157,11 +157,11 @@ def magic_link_verify(request, uidb64, token):
             raise ValueError("UID mismatch")
         user = User.objects.get(pk=pk, magic_link_nonce=nonce)
     except (BadSignature, SignatureExpired, ValueError, User.DoesNotExist):
-        messages.error(request, "رابط الدخول غير صالح أو منتهي الصلاحية.")
+        messages.error(request, "رابط التفعيل خطأ أو منتهٍ.")
         return redirect("magic_link_request")
 
     if not user.is_active:
-        messages.error(request, "رابط الدخول غير صالح أو منتهي الصلاحية.")
+        messages.error(request, "رابط التفعيل خطأ أو منتهٍ.")
         return redirect("magic_link_request")
 
     # Single-use: invalidate the nonce before login to prevent replay.
@@ -169,7 +169,7 @@ def magic_link_verify(request, uidb64, token):
     user.save(update_fields=["magic_link_nonce"])
 
     login(request, user)
-    messages.success(request, "تم تسجيل الدخول بنجاح.")
+    messages.success(request, "سجلت دخولك.")
     return redirect("home")
 
 
@@ -204,7 +204,7 @@ def account_settings(request):
         form = AccountSettingsForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, "تم تحديث إعدادات الحساب.")
+            messages.success(request, "تحدث حسابك.")
             return redirect("account_settings")
     else:
         form = AccountSettingsForm(instance=request.user)
@@ -287,7 +287,7 @@ def profile_edit(request):
         )
         if form.is_valid():
             form.save()
-            messages.success(request, "تم تحديث الملف الشخصي.")
+            messages.success(request, "تحدث ملفك.")
             return redirect("public_profile", username=request.user.username)
     else:
         form = ProfileEditForm(instance=profile)

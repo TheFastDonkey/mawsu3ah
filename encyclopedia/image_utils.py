@@ -62,7 +62,7 @@ def validate_cover_image(image) -> None:
         with Image.open(image) as img:
             img.verify()
     except Exception as exc:
-        raise ValidationError("الملف ليس صورة صالحة.") from exc
+        raise ValidationError("الملف ليس صورة مقبولة.") from exc
     finally:
         image.seek(0)
 
@@ -71,12 +71,12 @@ def validate_cover_image(image) -> None:
             fmt = img.format
             width, height = img.size
     except Exception as exc:
-        raise ValidationError("الملف ليس صورة صالحة.") from exc
+        raise ValidationError("الملف ليس صورة مقبولة.") from exc
     finally:
         image.seek(0)
 
     if fmt not in ALLOWED_PIL_FORMATS:
-        raise ValidationError("يُسمح فقط بصيغ JPEG و PNG و WebP.")
+        raise ValidationError("لا يسمح إلا بصيغة JPEG و PNG و WebP.")
 
     if width > MAX_COVER_INPUT_DIMENSION or height > MAX_COVER_INPUT_DIMENSION:
         raise ValidationError(

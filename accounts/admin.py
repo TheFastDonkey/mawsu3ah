@@ -21,11 +21,11 @@ class Mawsu3ahAdminAuthenticationForm(OTPAdminAuthenticationForm):
 
     otp_error_messages = {
         **OTPAdminAuthenticationForm.otp_error_messages,
-        "token_required": "من فضلك أدخل رمز التحقق.",
-        "invalid_token": "الرمز غير صحيح. تأكد من إدخاله بشكل صحيح.",
+        "token_required": "أدخل رمز التحقق.",
+        "invalid_token": "الرمز غير صحيح، تأكد منه.",
         "challenge_exception": "حدث خطأ أثناء إرسال الرمز: {0}",
         "not_interactive": "طريقة التحقق المختارة لا تدعم إرسال الرمز.",
-        "verification_not_allowed": "التحقق من الرمز معطل حالياً.",
+        "verification_not_allowed": "التحقق من الرمز معطل حاليًّا.",
     }
 
     def _handle_challenge(self, device):
@@ -34,7 +34,7 @@ class Mawsu3ahAdminAuthenticationForm(OTPAdminAuthenticationForm):
         except ValidationError as err:
             if isinstance(device, EmailDevice):
                 raise ValidationError(
-                    "تم إرسال الرمز إلى بريدك الإلكتروني.",
+                    "أرسلناالرمز إلى بريدك.",
                     code="challenge_message",
                 ) from err
             raise

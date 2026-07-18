@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load encyclopedia_extras %}
 
-{% block title %}{{ record.name }} — ناشر{% endblock %}
+{% block title %}{{ record.name }} - ناشر{% endblock %}
 {% block meta_description %}طبعات نشرها {{ record.name }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% block content %}
@@ -15,6 +15,6 @@
         {% endfor %}
     </div>
 {% else %}
-    <p>لا توجد طبعات معتمدة لهذا الناشر.</p>
+    <p>لا طبعات مضافة لهذا الناشر.</p>
 {% endif %}
 {% endblock %}

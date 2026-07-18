@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}المحققون — الموسوعة الكبرى{% endblock %}
+{% block title %}المحققون - الموسوعة الكبرى{% endblock %}
 {% block meta_description %}تصفح قائمة المحققين في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% block content %}
 <section class="page-header">
     <h1>المحققون</h1>
-    <p class="page-subtitle">المحققون الذين لديهم طبعات معتمدة في الموسوعة.</p>
+    <p class="page-subtitle">المحققون الذين لهم طبعات في الموسوعة.</p>
 </section>
 
 <section class="content-section">
@@ -21,7 +21,7 @@
     </ul>
     {% include "components/core/pagination.html" with page_obj=page_obj %}
     {% else %}
-    <p class="empty-state">لا يوجد محققون معتمدون بعد.</p>
+    <p class="empty-state">لا محققون.</p>
     {% endif %}
 </section>
 {% endblock %}

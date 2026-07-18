@@ -53,7 +53,7 @@
                     <a href="{% url 'home' %}">الرئيسية</a>
                     <a href="{% url 'category_list' %}">التصنيفات</a>
                     <a href="{% url 'submit_edition' %}">ترشيح طبعة</a>
-                    <a href="{% url 'about' %}">من نحن</a>
+                    <a href="{% url 'about' %}">ما هذا الموقع؟</a>
                     <a href="{% url 'contact' %}">تواصل معنا</a>
                     <div class="nav-links__browse">
                         {% include "components/core/category_tree.html" %}
@@ -132,7 +132,7 @@
                 <a href="{% url 'about' %}">من نحن</a>
                 <a href="{% url 'contact' %}">تواصل معنا</a>
             </nav>
-            <p>مشروع مجتمعي مفتوح — الموسوعة الكبرى لأفضل طبعات الكتب</p>
+            <p>مشروع مجتمعي مفتوح - الموسوعة الكبرى لأفضل طبعات الكتب</p>
         </div>
     </footer>
     <script nonce="{{ request.csp_nonce }}">

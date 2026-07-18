@@ -33,7 +33,7 @@ class Category(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="children",
-        verbose_name="التصنيف الأب",
+        verbose_name="التصنيف الأصلي",
     )
     path = models.CharField(
         max_length=500,
@@ -111,12 +111,12 @@ class Category(models.Model):
         super().clean()
         if self.parent_id:
             if self.parent_id == self.pk:
-                raise ValidationError("لا يمكن أن يكون التصنيف أباً لنفسه.")
+                raise ValidationError("لا يكون التصنيف أصلًا لنفسه.")
             if self.pk and Category.objects.filter(
                 pk=self.parent_id, path__startswith=self.path
             ).exists():
                 raise ValidationError(
-                    "لا يمكن نقل تصنيف إلى أحد أحفاده."
+                    "لا يٌنقل تصنيف إلى فرع فرعه."
                 )
 
     @property
@@ -280,7 +280,7 @@ class Book(models.Model):
     aliases = models.TextField(
         blank=True,
         verbose_name="أسماء بديلة",
-        help_text="أسماء أو تهجئات بديلة مفصولة بفواصل.",
+        help_text="أسماء بديلة مفصولة بفواصل.",
     )
     disambiguation = models.TextField(
         blank=True,
@@ -332,7 +332,7 @@ class Book(models.Model):
 
 
 class EditionStatus(models.TextChoices):
-    PENDING = "pending", "قيد المراجعة"
+    PENDING = "pending", "يًراجع"
     APPROVED = "approved", "معتمد"
     REJECTED = "rejected", "مرفوض"
 
@@ -378,7 +378,7 @@ class Edition(models.Model):
         max_length=200,
         blank=True,
         verbose_name="مدينة النشر",
-        help_text="مدينة نشر يدوية (اختيارية؛ تُستخدم عند وجود أكثر من ناشر).",
+        help_text="مدينة النشر (لا تُكتب إلا عند وجود أكثر من ناشر).",
     )
     volumes = models.CharField(
         max_length=40,
@@ -390,7 +390,7 @@ class Edition(models.Model):
         blank=True,
         null=True,
         verbose_name="صورة الغلاف",
-        help_text="صورة اختيارية للطبعة (JPEG أو PNG أو WebP، بحد أقصى 2 ميجابايت).",
+        help_text="صورة للطبعة (JPEG أو PNG أو WebP، بحد أقصى 2 ميجابايت).",
     )
     status = models.CharField(
         max_length=20,
@@ -402,7 +402,7 @@ class Edition(models.Model):
     is_best = models.BooleanField(
         default=False,
         verbose_name="هل هذه أفضل طبعة؟",
-        help_text="إذا كنت خبيراً واخترت هذا الخيار، سيظهر ختم 'رشحها خبير' على الطبعة.",
+        help_text="إذا كنت خبيراً واخترت 'نعم'، ستظهر شارة 'رشحها خبير' على الطبعة.",
     )
     submitted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -420,7 +420,7 @@ class Edition(models.Model):
         null=True,
         blank=True,
         related_name="approved_editions",
-        verbose_name="اعتمد من قبل",
+        verbose_name="اعتمدها",
     )
     approved_at = models.DateTimeField(
         blank=True,
@@ -528,7 +528,7 @@ class Review(models.Model):
         null=True,
         blank=True,
         related_name="replies",
-        verbose_name="المراجعة الأب",
+        verbose_name="المراجعة الأصلية",
     )
     body = models.TextField(verbose_name="المراجعة")
     hidden = models.BooleanField(default=False, db_index=True, verbose_name="مخفي")
@@ -622,8 +622,8 @@ class ReviewReport(models.Model):
         ("inappropriate", "محتوى غير لائق"),
         ("harassment", "إساءة"),
         ("offtopic", "غير ذي صلة"),
-        ("spam", "رسائل مزعجة / إعلانات"),
-        ("other", "أخرى"),
+        ("spam", "إزعاج / إعلانات"),
+        ("other", "سبب آخر"),
     ]
     review = models.ForeignKey(
         Review,
@@ -666,7 +666,7 @@ class ReviewReport(models.Model):
 
 
 class CategorySuggestionStatus(models.TextChoices):
-    PENDING = "pending", "غير مُتحقَّق"
+    PENDING = "pending", "يُراجع"
     APPROVED = "approved", "معتمد"
     REJECTED = "rejected", "مرفوض"
 
@@ -765,7 +765,7 @@ class CategorySuggestionVote(models.Model):
 
 
 class CategoryRequestStatus(models.TextChoices):
-    PENDING = "pending", "قيد المراجعة"
+    PENDING = "pending", "يٌراجع"
     APPROVED = "approved", "معتمد"
     REJECTED = "rejected", "مرفوض"
 
@@ -913,13 +913,13 @@ class EditionEditSuggestion(models.Model):
     page_count = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name="عدد الصفحات",
+        verbose_name="الصفحات",
     )
     city = models.CharField(
         max_length=200,
         blank=True,
         verbose_name="مدينة النشر",
-        help_text="مدينة نشر يدوية (اختيارية؛ تُستخدم عند وجود أكثر من ناشر).",
+        help_text="مدينة النشر (لا تُكتب إلا عند وجود أكثر من ناشر).",
     )
     volumes = models.CharField(
         max_length=40,
@@ -1070,7 +1070,7 @@ class EditionBookLink(models.Model):
 
 
 class EditionBookLinkSuggestionStatus(models.TextChoices):
-    PENDING = "pending", "قيد المراجعة"
+    PENDING = "pending", "يٌراجع"
     APPROVED = "approved", "معتمد"
     REJECTED = "rejected", "مرفوض"
 
@@ -1205,7 +1205,7 @@ class EditionRelation(models.Model):
 
 
 class EditionRelationSuggestionStatus(models.TextChoices):
-    PENDING = "pending", "قيد المراجعة"
+    PENDING = "pending", "يٌراجع"
     APPROVED = "approved", "معتمد"
     REJECTED = "rejected", "مرفوض"
 
@@ -1229,7 +1229,7 @@ class EditionRelationSuggestion(models.Model):
         default=dict,
         blank=True,
         verbose_name="بيانات الطبعة الجديدة",
-        help_text="تُستخدم عند اقتراح طبعة غير موجودة بعد.",
+        help_text="تُستخدم عند اقتراح طبعة غير موجودة.",
     )
     kind = models.CharField(
         max_length=20,
@@ -1429,7 +1429,7 @@ def _approve_pending_relation_suggestions(sender, instance, created, **kwargs):
 
 
 class NameRecordStatus(models.TextChoices):
-    PENDING = "pending", "قيد المراجعة"
+    PENDING = "pending", "يٌراجع"
     APPROVED = "approved", "معتمد"
     REJECTED = "rejected", "مرفوض"
 
@@ -1472,7 +1472,7 @@ class NameRecord(models.Model):
         max_length=200,
         blank=True,
         verbose_name="مدينة النشر",
-        help_text="مدينة نشر يدوية (اختيارية؛ تُستخدم عند وجود أكثر من ناشر).",
+        help_text="مدينة النشر (لا تُكتب إلا عند وجود أكثر من ناشر).",
     )
     submitted_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ التقديم")
     approved_by = models.ForeignKey(
@@ -1481,7 +1481,7 @@ class NameRecord(models.Model):
         null=True,
         blank=True,
         related_name="approved_name_records",
-        verbose_name="اعتمد من قبل",
+        verbose_name="اعتمدها",
     )
     approved_at = models.DateTimeField(
         blank=True,
@@ -1494,7 +1494,7 @@ class NameRecord(models.Model):
         null=True,
         blank=True,
         related_name="rejected_name_records",
-        verbose_name="رفض من قبل",
+        verbose_name="رفضها",
     )
     rejected_at = models.DateTimeField(
         blank=True,

@@ -14,7 +14,7 @@ class User(AbstractUser):
         blank=True,
         default="",
         verbose_name="شارة الخبير",
-        help_text="النص الذي يظهر بجانب اسم المستخدم الخبير. إذا ترك فارغاً، ستظهر 'خبير'.",
+        help_text="الشارة التي تصاحب اسم الخبير. إذا ترك فارغاً، ستكون: 'خبير'.",
     )
     flairs = models.CharField(
         max_length=255,

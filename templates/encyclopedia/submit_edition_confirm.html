@@ -3,8 +3,8 @@
 {% block title %}تأكيد تقديم طبعة{% endblock %}
 
 {% block content %}
-<h1>تنبيه: طبعات مشابهة موجودة</h1>
-<p>وجدنا طبعات معتمدة قد تكون مطابقة لما تريد إضافته. يرجى التحقق قبل المتابعة.</p>
+<h1>تنبيه: في الموقع طبعات مشابهة</h1>
+<p>وجدنا طبعات قد تكون مطابقة لما تريد إضافته، تحقق منها.</p>
 
 <ul class="duplicate-list">
     {% for edition in duplicates %}
@@ -22,7 +22,7 @@
         {% if field.name == 'cover_image' %}
             {% if temp_cover_image %}
                 <input type="hidden" name="temp_cover_image" value="{{ temp_cover_image }}">
-                <p class="c-alert c-alert--success">تم حفظ صورة الغلاف مؤقتاً. إذا اخترت صورة جديدة أدناه، ستُستخدم الجديدة.</p>
+                <p class="c-alert c-alert--success">حفظنا صورة الغلاف مؤقتًا. إذا اخترت صورة جديدة أدناه، فسنستخدم الجديدة.</p>
             {% endif %}
             {% include "components/core/form_field.html" with field=field %}
         {% else %}

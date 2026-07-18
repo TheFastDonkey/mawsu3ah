@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 {% load encyclopedia_extras %}
 
-{% block title %}المساهمات{% endblock %}
+{% block title %}مساهماتي{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">المساهمات</h1>
+    <h1 class="page-title">مساهماتي</h1>
     <p class="page-subtitle">تتبع طلباتك ومساهماتك في الموسوعة.</p>
 </div>
 
 {% if pending_count %}
 <div class="c-alert">
-    <p>لديك <strong>{{ pending_count }}</strong> مساهمة/طلب قيد المراجعة.</p>
+    <p>لديك <strong>{{ pending_count }}</strong>مساهمة تٌراجع.</p>
 </div>
 {% endif %}
 
 {% if not editions and not category_suggestions and not category_requests and not name_records and not edit_suggestions %}
 <div class="empty-state">
-    <p>لم تقدّم أي مساهمات بعد.</p>
+    <p>لمّا تساهم بشيء.</p>
     <a href="{% url 'submit_edition' %}" class="c-button c-button--primary">ترشيح طبعة</a>
 </div>
 {% else %}

@@ -46,7 +46,7 @@ class ReviewForm(forms.ModelForm):
         body = self.cleaned_data.get("body", "")
         body = strip_tags(body).strip()
         if not body:
-            raise ValidationError("المراجعة لا يمكن أن تكون فارغة.")
+            raise ValidationError("لا تكون المراجعة فارغة.")
         return body
 
 
@@ -67,14 +67,14 @@ class ReviewReplyForm(forms.ModelForm):
         body = self.cleaned_data.get("body", "")
         body = strip_tags(body).strip()
         if not body:
-            raise ValidationError("الرد لا يمكن أن يكون فارغاً.")
+            raise ValidationError("لا يكون الرد فارغًا.")
         return body
 
     def clean(self):
         cleaned = super().clean()
         parent = self.instance.parent if self.instance.pk else None
         if parent and self.edition and parent.edition_id != self.edition.pk:
-            raise ValidationError("لا يمكن الرد على مراجعة من طبعة أخرى.")
+            raise ValidationError("لا يمكن الرد على مراجعة لطبعة أخرى.")
         return cleaned
 
 
@@ -112,7 +112,7 @@ class CategorySuggestionForm(forms.Form):
     def clean_category(self):
         category = self.cleaned_data.get("category")
         if not category:
-            raise ValidationError("يرجى اختيار تصنيف موجود.")
+            raise ValidationError("اختر تصنيفًا موجودًا.")
         return category
 
     def clean(self):
@@ -125,12 +125,12 @@ class CategorySuggestionForm(forms.Form):
                 except Book.DoesNotExist as err:
                     raise ValidationError("الكتاب غير موجود.") from err
                 if book.categories.filter(pk=category.pk).exists():
-                    raise ValidationError("هذا الكتاب مُدرج بالفعل ضمن هذا التصنيف.")
+                    raise ValidationError("الكتاب في هذا التصنيف.")
                 if book.category_suggestions.filter(
                     final_category=category,
                     status=CategorySuggestionStatus.PENDING,
                 ).exists():
-                    raise ValidationError("هذا التصنيف مُقترح بالفعل لهذا الكتاب.")
+                    raise ValidationError("التصنيف هذا قد اٌقترح سابقًا لهذا الكتاب.")
         return cleaned
 
 
@@ -141,7 +141,7 @@ class CategoryRequestForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "c-input",
-                "placeholder": "مثال: تاريخ إسلامي",
+                "placeholder": "مثلًا: فقه.",
                 "autocomplete": "off",
             }
         ),
@@ -150,16 +150,16 @@ class CategoryRequestForm(forms.Form):
     def clean_name(self):
         name = self.cleaned_data.get("name", "").strip()
         if not name:
-            raise ValidationError("يرجى إدخال اسم التصنيف.")
+            raise ValidationError("أدخل اسم التصنيف.")
         if Category.objects.filter(name__iexact=name).exists():
-            raise ValidationError("يوجد تصنيف بهذا الاسم. اختره من القائمة.")
+            raise ValidationError("التصنيف موجود، فاختره من القائمة.")
         return name
 
 
 class EditionSubmissionForm(forms.Form):
     BOOK_ACTION_CHOICES = [
-        ("existing", "اختر كتاباً موجوداً"),
-        ("new", "أضف كتاباً جديداً"),
+        ("existing", "اختر كتابًا موجودًا"),
+        ("new", "أضف كتابًا جديدًا"),
     ]
 
     book_action = forms.ChoiceField(
@@ -188,12 +188,12 @@ class EditionSubmissionForm(forms.Form):
         max_length=300,
         required=False,
         label="إضافة مؤلف",
-        help_text="اكتب الاسم كاملاً ثم اختر من القائمة. يمكنك إضافة أكثر من مؤلف.",
+        help_text="اكتب الاسم ثم اختره من القائمة، وإن أردت إضافة اسم غير موجود فاكتبه ثلاثيًّا. يمكنك إضافة أكثر من مؤلف.",
     )
     new_book_categories = forms.CharField(
         required=False,
         label="تصنيفات الكتاب",
-        help_text="اختر تصنيفاً واحداً على الأقل. ابدأ بالكتابة ثم اختر من القائمة.",
+        help_text="اختر تصنيفًا على الأقل. اكتب ثم اختره من القائمة.",
         widget=forms.HiddenInput,
     )
     publishers = forms.CharField(
@@ -205,7 +205,7 @@ class EditionSubmissionForm(forms.Form):
         max_length=300,
         required=False,
         label="إضافة ناشر",
-        help_text="اكتب اسم الناشر ثم اختر من القائمة. يمكنك إضافة أكثر من ناشر.",
+        help_text="اكتب اسم الناشر ثم اختره من القائمة. يمكنك إضافة أكثر من ناشر.",
     )
     year = forms.IntegerField(
         required=False,
@@ -222,7 +222,7 @@ class EditionSubmissionForm(forms.Form):
         max_length=300,
         required=False,
         label="إضافة محقق",
-        help_text="اكتب الاسم كاملاً ثم اختر من القائمة. يمكنك إضافة أكثر من اسم.",
+        help_text="اكتب الاسم ثم اختره من القائمة، وإن أردت إضافة اسم غير موجود فاكتبه ثلاثيًّا. يمكنك إضافة أكثر من محقق.",
     )
     volumes = forms.CharField(
         max_length=40,
@@ -232,13 +232,13 @@ class EditionSubmissionForm(forms.Form):
     page_count = forms.IntegerField(
         required=False,
         min_value=1,
-        label="عدد الصفحات",
+        label="الصفحات",
     )
     city = forms.CharField(
         max_length=200,
         required=False,
         label="مدينة النشر",
-        help_text="اختياري. تُستخدم فقط عند وجود أكثر من ناشر؛ وإلا تُعرض مدينة الناشر.",
+        help_text="لا تٌكتب إلا عند وجود أكثر من ناشر، وإلا فالمدينة هي مدينة الناشر تلقائيًّا.",
     )
     cover_image = forms.ImageField(
         required=False,
@@ -253,7 +253,7 @@ class EditionSubmissionForm(forms.Form):
         coerce=lambda x: x == "yes",
         required=True,
         label="هل هذه أفضل طبعة؟",
-        help_text="اختر 'نعم' إذا كانت هذه أفضل طبعة معروفة للكتاب.",
+        help_text="اختر 'نعم' إذا كانت هذه أفضل طبعة. ينبني على اختيارك إن كنت خبيرًا أن يظهر عند اسمها 'رشحها خبير'",
         widget=forms.RadioSelect,
     )
 
@@ -317,7 +317,7 @@ class EditionSubmissionForm(forms.Form):
     def clean_year(self):
         year = self.cleaned_data.get("year")
         if year and year > datetime.now().year + 1:
-            raise ValidationError("سنة النشر لا يمكن أن تكون في المستقبل البعيد.")
+            raise ValidationError("سنة النشر لا تكون في المستقبل.")
         return year
 
     def clean_city(self):
@@ -329,7 +329,7 @@ class EditionSubmissionForm(forms.Form):
     def clean_publishers(self):
         names = self._parse_name_json(self.cleaned_data.get("publishers", ""))
         if not names:
-            raise ValidationError("يرجى إدخال ناشر واحد على الأقل.")
+            raise ValidationError("اكتب اسم ناشر واحد على الأقل.")
         return names
 
     def clean_editors(self):
@@ -374,22 +374,22 @@ class EditionSubmissionForm(forms.Form):
 
         if action == "existing":
             if not cleaned.get("existing_book"):
-                self.add_error("existing_book", "يرجى اختيار كتاب موجود.")
+                self.add_error("existing_book", "اختر كتابًا موجود.")
         elif action == "new":
             if not cleaned.get("new_book_title"):
-                self.add_error("new_book_title", "يرجى إدخال عنوان الكتاب.")
+                self.add_error("new_book_title", "اكتب عنوان الكتاب.")
             authors = cleaned.get("new_book_authors") or []
             if not authors:
-                self.add_error("new_book_authors", "يرجى إدخال مؤلف واحد على الأقل.")
+                self.add_error("new_book_authors", "اكتب اسم مؤلف واحد على الأقل.")
             categories = cleaned.get("new_book_categories") or []
             if not categories:
-                self.add_error("new_book_categories", "يرجى اختيار تصنيف واحد على الأقل.")
+                self.add_error("new_book_categories", "اختر تصنيفًا واحدًا على الأقل.")
             if cleaned.get("new_book_title") and authors and Book.objects.filter(
                 title=cleaned["new_book_title"],
                 authors__name__in=authors,
             ).exists():
                 raise ValidationError(
-                    "يوجد كتاب بنفس العنوان وأحد مؤلفيه. اختره من القائمة أو غيّر البيانات."
+                    " في الموقع كتاب للمؤلف بهذا العنوان، فاختره من القائمة."
                 )
 
         return cleaned
@@ -577,7 +577,7 @@ class EditionEditSuggestionForm(forms.ModelForm):
         max_length=300,
         required=False,
         label="إضافة ناشر",
-        help_text="اكتب اسم الناشر ثم اختر من القائمة. يمكنك إضافة أكثر من ناشر.",
+        help_text="اكتب اسم الناشر ثم اختره من القائمة. يمكنك إضافة أكثر من ناشر.",
     )
     proposed_editors = forms.CharField(
         required=False,
@@ -588,7 +588,7 @@ class EditionEditSuggestionForm(forms.ModelForm):
         max_length=300,
         required=False,
         label="إضافة محقق",
-        help_text="اكتب الاسم كاملاً ثم اختر من القائمة. يمكنك إضافة أكثر من اسم.",
+        help_text="اكتب الاسم ثم اختره من القائمة، وإن أردت إضافة اسم غير موجود فاكتبه ثلاثيًّا. يمكنك إضافة أكثر من محقق.",
     )
     reason = forms.CharField(
         required=False,
@@ -614,7 +614,7 @@ class EditionEditSuggestionForm(forms.ModelForm):
         }
         help_texts = {
             "cover_image": "اختياري. JPEG أو PNG أو WebP، بحد أقصى 2 ميجابايت.",
-            "city": "اختياري. عند وجود ناشر واحد يُحدّث مدينة الناشر؛ وعند وجود عدة ناشرين يُخزّن يدوياً لهذه الطبعة.",
+            "city": "لا تٌكتب إلا عند وجود أكثر من ناشر، وإلا فالمدينة هي مدينة الناشر تلقائيًّا.",
         }
 
     def __init__(self, *args, **kwargs):
@@ -674,7 +674,7 @@ class EditionEditSuggestionForm(forms.ModelForm):
     def clean_year(self):
         year = self.cleaned_data.get("year")
         if year and year > datetime.now().year + 1:
-            raise ValidationError("سنة النشر لا يمكن أن تكون في المستقبل البعيد.")
+            raise ValidationError("سنة النشر لا تكون في المستقبل.")
         return year
 
     def clean_city(self):
@@ -750,7 +750,7 @@ class EditionBookLinkSuggestionForm(forms.ModelForm):
         max_length=300,
         required=False,
         label="الطبعة",
-        help_text="ابدأ بعنوان الكتاب أو الناشر أو سنة النشر ثم اختر من القائمة.",
+        help_text="اكتب عنوان الكتاب أو اسم الناشر.",
     )
 
     class Meta:
@@ -783,16 +783,16 @@ class EditionBookLinkSuggestionForm(forms.ModelForm):
     def clean_edition(self):
         edition = self.cleaned_data.get("edition")
         if not edition:
-            raise ValidationError("يرجى اختيار طبعة من القائمة.")
+            raise ValidationError("اختر طبعة من القائمة.")
         if edition.book_id == self.book.pk:
-            raise ValidationError("هذه طبعة أصلية لهذا الكتاب.")
+            raise ValidationError("هذه طبعة أصلية.")
         with transaction.atomic():
             try:
                 book = Book.objects.select_for_update().get(pk=self.book.pk)
             except Book.DoesNotExist as err:
                 raise ValidationError("الكتاب غير موجود.") from err
             if EditionBookLink.objects.filter(edition=edition, book=book).exists():
-                raise ValidationError("هذه الطبعة مرتبطة بالفعل بهذا الكتاب.")
+                raise ValidationError("هذه الطبعة مرتبطة بهذا الكتاب أصلًا.")
             if EditionBookLinkSuggestion.objects.filter(
                 edition=edition, book=book, status="pending"
             ).exists():
@@ -827,7 +827,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
         max_length=300,
         required=False,
         label="الطبعة",
-        help_text="ابدأ بعنوان الكتاب أو الناشر أو سنة النشر ثم اختر من القائمة.",
+        help_text="اكتب عنوان الكتاب أو اسم الناشر، ثم اختره من القائمة.",
     )
     new_publishers = forms.CharField(
         required=False,
@@ -838,7 +838,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
         max_length=300,
         required=False,
         label="إضافة ناشر",
-        help_text="اكتب اسم الناشر ثم اختر من القائمة. يمكنك إضافة أكثر من ناشر.",
+        help_text="اكتب اسم الناشر ثم اختره من القائمة. يمكنك إضافة أكثر من ناشر.",
     )
     new_editors = forms.CharField(
         required=False,
@@ -849,7 +849,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
         max_length=300,
         required=False,
         label="إضافة محقق",
-        help_text="اكتب الاسم كاملاً ثم اختر من القائمة. يمكنك إضافة أكثر من اسم.",
+        help_text="اكتب الاسم ثم اختره من القائمة، وإن أردت إضافة اسم غير موجود فاكتبه ثلاثيًّا. يمكنك إضافة أكثر من محقق.",
     )
     new_year = forms.IntegerField(
         required=False,
@@ -860,7 +860,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
     new_page_count = forms.IntegerField(
         required=False,
         min_value=1,
-        label="عدد الصفحات",
+        label="الصفحات",
     )
     new_city = forms.CharField(
         max_length=200,
@@ -899,7 +899,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
                 "hx-target": "#id_target-suggestions",
                 "hx-indicator": "#id_target-indicator",
                 "autocomplete": "off",
-                "placeholder": "مثال: دار ابن كثير 2015",
+                "placeholder": "مثال: دار الكتب والوثائق القومية 2021",
             }
         )
         self.fields["publisher_search"].widget.attrs.update(
@@ -909,7 +909,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
                 "hx-target": "#id_publisher-suggestions",
                 "hx-indicator": "#id_publisher-indicator",
                 "autocomplete": "off",
-                "placeholder": "مثال: دار ابن كثير",
+                "placeholder": "مثال: دار الكتب والوثائق القومية",
             }
         )
         self.fields["editor_search"].widget.attrs.update(
@@ -919,7 +919,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
                 "hx-target": "#id_editor-suggestions",
                 "hx-indicator": "#id_editor-indicator",
                 "autocomplete": "off",
-                "placeholder": "مثال: سناء ناهص",
+                "placeholder": "مثال: عبد الستار أحمد فراج",
             }
         )
 
@@ -958,7 +958,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
     def clean_new_year(self):
         year = self.cleaned_data.get("new_year")
         if year and year > datetime.now().year + 1:
-            raise ValidationError("سنة النشر لا يمكن أن تكون في المستقبل البعيد.")
+            raise ValidationError("سنة النشر لا تكون في المستقبل.")
         return year
 
     def clean_new_city(self):
@@ -971,7 +971,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
         cleaned = super().clean()
         mode = cleaned.get("target_mode")
         if not self.source:
-            raise ValidationError("الطبعة الأصل غير محددة.")
+            raise ValidationError("لم تحدد الطبعة الأصل.")
 
         with transaction.atomic():
             try:
@@ -982,14 +982,14 @@ class EditionRelationSuggestionForm(forms.ModelForm):
             if mode == "existing":
                 target = cleaned.get("target")
                 if not target:
-                    self.add_error("target", "يرجى اختيار طبعة من القائمة.")
+                    self.add_error("target", "اختر طبعة من القائمة.")
                     return cleaned
                 if target.pk == source.pk:
-                    self.add_error("target", "لا يمكن ربط الطبعة بنفسها.")
+                    self.add_error("target", "لا تٌربط الطبعة بنفسها.")
                 if target.book_id != source.book_id:
-                    self.add_error("target", "يجب أن تكون الطبعة المختارة لنفس الكتاب.")
+                    self.add_error("target", "لا بد أن تكون الطبعة للكتاب نفسه.")
                 if EditionRelation.objects.filter(source=source, target=target).exists():
-                    self.add_error("target", "هاتان الطبعتان مرتبطتان بالفعل.")
+                    self.add_error("target", "هاتان الطبعتان مربوطتان أصلًا.")
                 if EditionRelationSuggestion.objects.filter(
                     source=source, target=target, status="pending"
                 ).exists():
@@ -1001,9 +1001,9 @@ class EditionRelationSuggestionForm(forms.ModelForm):
                 publishers = cleaned.get("new_publishers") or []
                 year = cleaned.get("new_year")
                 if not publishers:
-                    self.add_error("new_publishers", "يرجى إدخال ناشر واحد على الأقل.")
+                    self.add_error("new_publishers", "اكتب اسم ناشر على الأقل.")
                 if not year:
-                    self.add_error("new_year", "يرجى إدخال سنة النشر.")
+                    self.add_error("new_year", "اكتب سنة النشر.")
                 if publishers and year:
                     existing = (
                         Edition.objects.filter(
@@ -1016,7 +1016,7 @@ class EditionRelationSuggestionForm(forms.ModelForm):
                     )
                     if existing.exists():
                         raise ValidationError(
-                            "يوجد طبعة معتمدة بنفس الناشر والسنة لهذا الكتاب. اخترها من القائمة."
+                            "في الموقع طبعة للناشر نفسه صدرت بنفس السنة، فاخترها من القائمة."
                         )
                 cleaned["target_data"] = {
                     "publishers": publishers,

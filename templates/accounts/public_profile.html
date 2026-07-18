@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ profile_user.username }} — الملف الشخصي{% endblock %}
+{% block title %}{{ profile_user.username }} - الملف الشخصي{% endblock %}
 {% block meta_description %}ملف {{ profile_user.username }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% load encyclopedia_extras %}
@@ -110,7 +110,7 @@
         </ul>
         {% include "components/core/pagination.html" with page_obj=items %}
       {% else %}
-        <p class="profile__empty">لم يُعتمد أي طبعة بعد.</p>
+        <p class="profile__empty">لما تٌعتمد أي طبعة.</p>
       {% endif %}
 
     {% elif tab == 'reviews' %}
@@ -126,7 +126,7 @@
         </ul>
         {% include "components/core/pagination.html" with page_obj=items %}
       {% else %}
-        <p class="profile__empty">لا توجد مراجعات بعد.</p>
+        <p class="profile__empty">ﻻ مراجعات.</p>
       {% endif %}
 
     {% elif tab == 'categories' %}
@@ -161,7 +161,7 @@
           </ul>
         {% endif %}
       {% else %}
-        <p class="profile__empty">لا توجد مساهمات في التصنيفات بعد.</p>
+        <p class="profile__empty">لما تساهم في التصنيفات.</p>
       {% endif %}
 
     {% elif tab == 'suggestions' %}
@@ -182,7 +182,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        <p class="profile__empty">لا توجد اقتراحات تعديل بعد.</p>
+        <p class="profile__empty">لما تقترح تعديلًا.</p>
       {% endif %}
 
     {% else %}
@@ -199,7 +199,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        <p class="profile__empty">لا توجد أسماء مقترحة بعد.</p>
+        <p class="profile__empty">لما تقترح اسمًا.</p>
       {% endif %}
     {% endif %}
   </section>

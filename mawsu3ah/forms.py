@@ -14,7 +14,7 @@ class ContactForm(forms.Form):
     )
     email = forms.EmailField(
         label="البريد الإلكتروني",
-        validators=[EmailValidator(message="أدخل عنوان بريد إلكتروني صالح.")],
+        validators=[EmailValidator(message="أدخل بريدًا إلكترونيًّا صحيحًا.")],
         widget=forms.EmailInput(
             attrs={"class": "c-input", "placeholder": "email@example.com"}
         ),
@@ -30,8 +30,8 @@ class ContactForm(forms.Form):
         label="الرسالة",
         min_length=10,
         error_messages={
-            "required": "الرسالة لا يمكن أن تكون فارغة.",
-            "min_length": "الرسالة قصيرة جداً؛ يُرجى كتابة تفاصيل أكثر.",
+            "required": "لا تكون الرسالة فارغة.",
+            "min_length": "الرسالة قصيرة جدًا",
         },
         widget=forms.Textarea(
             attrs={
@@ -45,5 +45,5 @@ class ContactForm(forms.Form):
     def clean_message(self):
         message = self.cleaned_data["message"].strip()
         if not message:
-            raise forms.ValidationError("الرسالة لا يمكن أن تكون فارغة.")
+            raise forms.ValidationError("لا تكون الرسالة فارغة.")
         return message

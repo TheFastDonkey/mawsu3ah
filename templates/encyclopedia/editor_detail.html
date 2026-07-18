@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load encyclopedia_extras %}
 
-{% block title %}{{ record.name }} — محقق{% endblock %}
+{% block title %}{{ record.name }} - محقق{% endblock %}
 {% block meta_description %}طبعات حققها {{ record.name }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% block content %}
@@ -15,6 +15,6 @@
         {% endfor %}
     </div>
 {% else %}
-    <p>لا توجد طبعات معتمدة لهذا المحقق.</p>
+    <p>لا طبعات مضافة لهذا المحقق.</p>
 {% endif %}
 {% endblock %}

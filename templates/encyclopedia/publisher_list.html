@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}الناشرون — الموسوعة الكبرى{% endblock %}
+{% block title %}الناشرون - الموسوعة الكبرى{% endblock %}
 {% block meta_description %}تصفح قائمة الناشرين في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% block content %}
 <section class="page-header">
     <h1>الناشرون</h1>
-    <p class="page-subtitle">الناشرون الذين لديهم طبعات معتمدة في الموسوعة.</p>
+    <p class="page-subtitle">الناشرون الذين لهم طبعات مضافة في الموسوعة.</p>
 </section>
 
 <section class="content-section">
@@ -21,7 +21,7 @@
     </ul>
     {% include "components/core/pagination.html" with page_obj=page_obj %}
     {% else %}
-    <p class="empty-state">لا يوجد ناشرون معتمدون بعد.</p>
+    <p class="empty-state">لا ناشرون في الموقع.</p>
     {% endif %}
 </section>
 {% endblock %}

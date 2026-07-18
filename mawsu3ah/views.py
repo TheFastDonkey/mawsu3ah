@@ -20,7 +20,7 @@ csp_logger = logging.getLogger("mawsu3ah.csp")
 contact_logger = logging.getLogger("mawsu3ah.contact")
 
 RATELIMITED_TEXT = (
-    "تم تجاوز الحد المسموح. يرجى الانتظار قليلاً والمحاولة مرة أخرى."
+    "جاوزت الحد في المحاولة، انتظر قليلًا."
 )
 
 
@@ -104,7 +104,7 @@ def contact(request):
         if ratelimited:
             messages.error(
                 request,
-                "تم تجاوز الحد المسموح به. يرجى الانتظار قليلاً والمحاولة مرة أخرى.",
+                "جاوزت الحد في المحاولة، انتظر قليلًا.",
             )
         elif form.is_valid():
             name = form.cleaned_data["name"]
@@ -130,7 +130,7 @@ def contact(request):
                 return redirect("contact")
             messages.error(
                 request,
-                "تعذر إرسال الرسالة حالياً. يرجى التحقق من إعدادات البريد أو المحاولة لاحقاً.",
+                "جاوزت الحد في المحاولة، انتظر قليلًا.",
             )
     else:
         initial = {}

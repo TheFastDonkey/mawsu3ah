@@ -840,12 +840,12 @@ def suggest_edition_relation(request, book_slug, edition_public_id):
             ):
                 messages.success(
                     request,
-                    "تم اعتماد اقتراح العلاقة مباشرةً لأنك خبير.",
+                    "اٌعتمد اقتراح العلاقة مباشرةً لأنك خبير.",
                 )
             else:
                 messages.success(
                     request,
-                    "تم استلام اقتراحك وسيتم مراجعته من قبل الإدارة.",
+                    "تسلمنا اقتراحك وستراجعه الإدارة.",
                 )
             return redirect(source.get_absolute_url())
     else:
@@ -929,12 +929,12 @@ def submit_edition(request):
                 if request.user.is_expert:
                     messages.success(
                         request,
-                        "تم نشر الطبعة مباشرةً لأنك خبير.",
+                        "نٌشرت الطبعة مباشرةً لأنك خبير.",
                     )
                 else:
                     messages.success(
                         request,
-                        "تم استلام طلب الطبعة وهو قيد المراجعة.",
+                        "استلمنا طلب إضافة الطبعة، وستراجعه الإدارة.",
                     )
                 return redirect("home")
         else:
@@ -963,12 +963,12 @@ def submit_edition(request):
                 if request.user.is_expert:
                     messages.success(
                         request,
-                        "تم نشر الطبعة مباشرةً لأنك خبير.",
+                        "نٌشرت الطبعة مباشرةً لأنك خبير.",
                     )
                 else:
                     messages.success(
                         request,
-                        "تم استلام طلب الطبعة وهو قيد المراجعة.",
+                        "استلمنا طلب إضافة الطبعة، وستراجعه الإدارة.",
                     )
                 return redirect("home")
     else:
@@ -1021,12 +1021,12 @@ def suggest_edition_edit(request, book_slug, edition_public_id):
             if request.user.is_expert:
                 messages.success(
                     request,
-                    "تم تطبيق اقتراح التعديل مباشرةً لأنك خبير.",
+                    "تعدلت الطبعة مباشرةً لأنك خبير.",
                 )
             else:
                 messages.success(
                     request,
-                    "تم استلام اقتراح التعديل وهو قيد المراجعة.",
+                    "تسلمنا اقتراح التعديل، وستراجعه الإدارة.",
                 )
             return redirect(edition.get_absolute_url())
     else:

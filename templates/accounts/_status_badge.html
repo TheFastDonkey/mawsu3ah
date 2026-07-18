@@ -1,7 +1,7 @@
 {% if label %}
     {% include "components/core/badge.html" with label=label variant=variant %}
 {% elif status == 'pending' %}
-    {% include "components/core/badge.html" with label="قيد المراجعة" variant="warning" %}
+    {% include "components/core/badge.html" with label="يٌراجع" variant="warning" %}
 {% elif status == 'approved' %}
     {% include "components/core/badge.html" with label="معتمد" variant="success" %}
 {% elif status == 'rejected' %}

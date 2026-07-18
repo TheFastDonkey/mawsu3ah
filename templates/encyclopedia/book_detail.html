@@ -68,7 +68,7 @@
 
 <section class="editions-section">
     <div class="editions-section__header">
-        <h2>الطبعات المعتمدة</h2>
+        <h2>الطبعات المضافة</h2>
         <div class="editions-section__actions">
             <a
                 href="?expert_first={% if expert_first %}0{% else %}1{% endif %}"
@@ -80,7 +80,7 @@
                 href="?original_only={% if original_only %}0{% else %}1{% endif %}"
                 class="c-button c-button--sm c-button--secondary"
             >
-                {% if original_only %}إظهار الكل{% else %}إظهار الأصلية فقط{% endif %}
+                {% if original_only %}إظهار الكل{% else %}إظهار الطبعات الأصلية فقط{% endif %}
             </a>
         </div>
     </div>
@@ -91,7 +91,7 @@
         {% endfor %}
     </div>
     {% else %}
-    <p class="empty-state">لا توجد طبعات معتمدة لهذا الكتاب بعد.</p>
+    <p class="empty-state">لا طبعات مضافة لهذا الكتاب.</p>
     {% endif %}
 </section>
 {% endblock %}

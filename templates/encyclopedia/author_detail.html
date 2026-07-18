@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load encyclopedia_extras %}
 
-{% block title %}{{ record.name }} — مؤلف{% endblock %}
+{% block title %}{{ record.name }} - مؤلف{% endblock %}
 {% block meta_description %}كتب {{ record.name }} في الموسوعة الكبرى لأفضل طبعات الكتب.{% endblock %}
 
 {% block content %}
@@ -19,12 +19,12 @@
             {% endif %}
             <div class="book-list__content">
                 <a href="{% url 'book_detail' book.slug %}">{{ book.title }}</a>
-                <span class="book-list__count">{{ book.approved_edition_count }} طبعة معتمدة</span>
+                <span class="book-list__count">{{ book.approved_edition_count }} طبعة مضافة</span>
             </div>
         </li>
         {% endfor %}
     </ul>
 {% else %}
-    <p>لا توجد كتب معتمدة لهذا المؤلف.</p>
+    <p>لا كتب مضافة لهذا الكاتب.</p>
 {% endif %}
 {% endblock %}

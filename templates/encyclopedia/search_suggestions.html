@@ -9,9 +9,9 @@
     </li>
     {% endfor %}
     <li class="suggestion-all">
-        <a href="{% url 'search' %}?q={{ query|urlencode }}">عرض كل النتائج</a>
+        <a href="{% url 'search' %}?q={{ query|urlencode }}">عرض النتائج كلها</a>
     </li>
 </ul>
 {% elif query %}
-<p class="search-suggestions-empty">لا توجد نتائج</p>
+<p class="search-suggestions-empty">لا نتائج</p>
 {% endif %}

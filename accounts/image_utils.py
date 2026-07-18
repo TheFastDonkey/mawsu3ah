@@ -17,13 +17,13 @@ def validate_avatar_image(image: InMemoryUploadedFile) -> None:
         raise ValidationError("حجم الصورة يجب ألا يتجاوز 2 ميجابايت.")
 
     if image.content_type not in ALLOWED_IMAGE_TYPES:
-        raise ValidationError("يُسمح فقط بصيغ JPEG و PNG و WebP.")
+        raise ValidationError("لا يسمح إلا بصيغة JPEG و PNG و WebP.")
 
     try:
         img = Image.open(image)
         img.verify()
     except Exception as exc:
-        raise ValidationError("الملف ليس صورة صالحة.") from exc
+        raise ValidationError("الملف ليس صورة مقبولة.") from exc
     finally:
         image.seek(0)
 
@@ -31,7 +31,7 @@ def validate_avatar_image(image: InMemoryUploadedFile) -> None:
         img = Image.open(image)
         width, height = img.size
     except Exception as exc:
-        raise ValidationError("الملف ليس صورة صالحة.") from exc
+        raise ValidationError("الملف ليس صورة مقبولة.") from exc
     finally:
         image.seek(0)
 

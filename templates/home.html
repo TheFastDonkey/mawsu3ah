@@ -8,7 +8,7 @@
         <div class="hero-text">
             <p class="kicker">{% include "components/core/icon.html" with name="book-open" size=16 %} دليل المقارنة</p>
             <h1>الموسوعة الكبرى لأفضل طبعات الكتب</h1>
-            <p class="hero-lead">نختار معاً الطبعات الورقية الأكثر موثوقية للكتب العربية، بإشراف خبراء ومراجعة دقيقة.</p>
+            <p class="hero-lead">موسوعة يساهم فيها الأفاضل بترشيحهم أفضل طبعات الكتب، لها خبراء مشرفون.</p>
             <form class="search-form" action="{% url 'search' %}" method="get">
                 <input type="search" name="q" placeholder="ابحث عن كتاب أو مؤلف..." aria-label="بحث"
                        hx-get="{% url 'search_suggestions' %}"
@@ -27,19 +27,19 @@
             {% if approved_editions_count %}
             <div class="stat">
                 <span class="stat-number" data-count-target="{{ approved_editions_count }}">+0</span>
-                <span class="stat-label">طبعة معتمدة</span>
+                <span class="stat-label">طبعة</span>
             </div>
             {% endif %}
             {% if books_count %}
             <div class="stat">
                 <span class="stat-number" data-count-target="{{ books_count }}">+0</span>
-                <span class="stat-label">كتاب موثق</span>
+                <span class="stat-label">كتاب</span>
             </div>
             {% endif %}
             {% if experts_count %}
             <div class="stat">
                 <span class="stat-number" data-count-target="{{ experts_count }}">+0</span>
-                <span class="stat-label">خبير مساهم</span>
+                <span class="stat-label">خبراء</span>
             </div>
             {% endif %}
             {% if members_count %}
@@ -69,7 +69,7 @@
         {% for edition in editions %}
         {% include "encyclopedia/partials/edition_card.html" %}
         {% empty %}
-        <p class="empty-state">لا توجد طبعات معتمدة بعد.</p>
+        <p class="empty-state">ﻻ طبعات مضافة</p>
         {% endfor %}
     </div>
 </section>
