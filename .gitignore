@@ -1,7 +1,6 @@
 # Development screenshots & working files
 garbage/
 /*.png
-accounts/management/commands/create_permanent_admin.py
 
 .venv/
 __pycache__/
