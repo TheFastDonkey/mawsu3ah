@@ -296,12 +296,13 @@
 
                 sidebar.querySelectorAll('a').forEach((link) => {
                     link.addEventListener('click', () => {
-                        if (isDesktop()) {
-                            sidebar.dataset.collapsed = 'true';
-                        } else {
+                        // On mobile the sidebar behaves like a drawer and should
+                        // close when the user navigates. On desktop it stays open
+                        // so the page transition does not flash a collapse.
+                        if (!isDesktop()) {
                             sidebar.dataset.expanded = 'false';
+                            updateAria();
                         }
-                        updateAria();
                     });
                 });
 

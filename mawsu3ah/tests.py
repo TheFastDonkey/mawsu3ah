@@ -46,6 +46,20 @@ class SidebarContextTests(TestCase):
         context = context_processors.sidebar(request)
         self.assertEqual(context["sidebar_roots"], [])
 
+    def test_sidebar_limits_roots_and_children(self):
+        roots = [Category.objects.create(name=f"أصل {i}") for i in range(12)]
+        for root in roots:
+            for j in range(10):
+                Category.objects.create(name=f"فرع {root.name} {j}", parent=root)
+
+        request = RequestFactory().get("/")
+        context = context_processors.sidebar(request)
+        returned_roots = context["sidebar_roots"]
+
+        self.assertEqual(len(returned_roots), context_processors.MAX_SIDEBAR_ROOTS)
+        for root in returned_roots:
+            self.assertLessEqual(len(root.sidebar_children), context_processors.MAX_SIDEBAR_CHILDREN_PER_ROOT)
+
     def test_sidebar_renders_on_home_page(self):
         Category.objects.create(name="عقيدة")
         response = self.client.get(reverse("home"))

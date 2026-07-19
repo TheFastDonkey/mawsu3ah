@@ -3,6 +3,10 @@
 from django.db.models import Count, OuterRef, Q, Subquery, Value
 
 
+MAX_SIDEBAR_ROOTS = 10
+MAX_SIDEBAR_CHILDREN_PER_ROOT = 8
+
+
 def sidebar(request):
     """Provide category data for the site-wide sidebar menu."""
     from encyclopedia.models import Book, Category, EditionStatus
@@ -44,7 +48,9 @@ def sidebar(request):
         else:
             children_map.setdefault(category.parent_id, []).append(category)
 
-    for root in roots:
-        root.sidebar_children = children_map.get(root.pk, [])
+    # Limit how many categories appear in the site-wide sidebar to keep the
+    # navigation usable when the taxonomy grows large.
+    for root in roots[:MAX_SIDEBAR_ROOTS]:
+        root.sidebar_children = children_map.get(root.pk, [])[:MAX_SIDEBAR_CHILDREN_PER_ROOT]
 
-    return {"sidebar_roots": roots}
+    return {"sidebar_roots": roots[:MAX_SIDEBAR_ROOTS]}
