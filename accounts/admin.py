@@ -10,7 +10,10 @@ from django.urls import path
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django_otp.admin import OTPAdminAuthenticationForm, OTPAdminSite
+from django_otp.plugins.otp_email.admin import EmailDeviceAdmin
 from django_otp.plugins.otp_email.models import EmailDevice
+from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from django_ratelimit.decorators import ratelimit
 
 from .models import Profile, User
@@ -152,6 +155,8 @@ admin.site = Mawsu3ahAdminSite()
 admin.sites.site = admin.site
 
 admin.site.register(Group)
+admin.site.register(EmailDevice, EmailDeviceAdmin)
+admin.site.register(TOTPDevice, TOTPDeviceAdmin)
 
 
 class ProfileInline(admin.StackedInline):
