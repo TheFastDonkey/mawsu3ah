@@ -3,8 +3,8 @@
 from django.db.models import Count, OuterRef, Q, Subquery, Value
 
 
-MAX_SIDEBAR_ROOTS = 10
-MAX_SIDEBAR_CHILDREN_PER_ROOT = 8
+MAX_SIDEBAR_ROOTS = 6
+MAX_SIDEBAR_CHILDREN_PER_ROOT = 5
 
 
 def sidebar(request):
