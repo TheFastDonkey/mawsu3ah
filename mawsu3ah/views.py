@@ -130,7 +130,7 @@ def contact(request):
                 return redirect("contact")
             messages.error(
                 request,
-                "جاوزت الحد في المحاولة، انتظر قليلًا.",
+                "لم نتسلم رسالتك؛ تحقق من البريد، أو حاول لاحقًا.",
             )
     else:
         initial = {}
